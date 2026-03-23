@@ -1,0 +1,115 @@
+{% extends "base.html.twig" %}
+
+{% block title %}About — NorthOps{% endblock %}
+{% block description %}NorthOps is two senior engineers in Northern Ontario delivering fixed-price web apps, pipelines, DevOps, and AI engineering.{% endblock %}
+
+{% block content %}
+    <!-- About Text -->
+    <section class="section section-hero">
+        <div class="container container-narrow">
+            <h1>About NorthOps</h1>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container container-narrow">
+            <div class="text-block">
+                <p>
+                    NorthOps started because we kept seeing the same problem: companies that needed senior engineering
+                    work done — a web app, a data pipeline, a deployment system — but couldn't justify a full-time hire
+                    and didn't want to roll the dice on a freelancer or offshore team.
+                </p>
+                <p>
+                    We're two senior engineers based in Northern Ontario. Between us we've built content platforms,
+                    e-commerce systems, insurance tech, health data pipelines, and loyalty programs used by hundreds
+                    of thousands of merchants. We've led teams, shipped production systems, and cleaned up the messes
+                    left behind when projects go sideways.
+                </p>
+                <p>
+                    We started NorthOps to offer something specific: senior-level engineering, fixed-price, delivered
+                    in days. No account managers, no juniors, no layers of overhead. You talk to the engineers who
+                    write the code. We scope tightly, build fast, and hand off clean.
+                </p>
+                <p>
+                    We work from Northern Ontario — Sudbury and Noelville — because that's where we live. The geography
+                    doesn't affect the quality of the work, but it does mean lower overhead, which we pass on as lower
+                    prices. Our MVPs start at CAD $3,600 because we've built these systems enough times to know exactly
+                    what's involved.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Bios -->
+    <section class="section section-alt">
+        <div class="container container-narrow">
+            <h2>The team</h2>
+            <div class="team-bios">
+                <div class="team-bio">
+                    <img src="https://avatars.githubusercontent.com/u/499552?v=4" alt="Russell Jones" class="team-photo">
+                    <h3>Russell Jones</h3>
+                    <p class="team-title">Senior Engineer &amp; Co-Founder</p>
+                    <p>
+                        Russell is a senior full-stack developer with deep experience in content pipelines, automation
+                        systems, and the Laravel/PHP ecosystem. He built North Cloud — a production content intelligence
+                        platform that crawls, classifies, and routes news articles in real time.
+                    </p>
+                    <p>
+                        Before NorthOps, Russell spent over a decade building web systems across agencies, startups,
+                        and enterprise clients. He cares deeply about clean code, solid deployment pipelines, and
+                        systems that the next person can actually understand and maintain.
+                    </p>
+                    <p>
+                        At NorthOps, Russell focuses on backend systems, data pipelines, deployment infrastructure,
+                        and the CI/CD that keeps everything shipping reliably. Based in Sudbury, Ontario.
+                    </p>
+                </div>
+
+                <div class="team-bio">
+                    <img src="/images/team/luc-hebert.jpg" alt="Luc Hebert" class="team-photo">
+                    <h3>Luc Hebert</h3>
+                    <p class="team-title">Senior Engineer &amp; Co-Founder</p>
+                    <p>
+                        Luc is a senior full-stack software engineer with experience spanning embedded systems,
+                        LMS platforms, insurance tech, and health data systems. Most recently at Smile.io building
+                        loyalty and e-commerce solutions for 100K+ Shopify merchants.
+                    </p>
+                    <p>
+                        From mining vehicle hardware in C to React and Ruby on Rails web stacks, Luc has led teams
+                        and shipped across wildly different domains. He brings a rare combination of hardware-level
+                        thinking and modern web development expertise.
+                    </p>
+                    <p>
+                        At NorthOps, Luc focuses on frontend architecture, TypeScript, and AI integrations —
+                        building the interfaces and intelligent features that users interact with. Based in
+                        Noelville, Ontario.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Principles -->
+    <section class="section">
+        <div class="container container-narrow">
+            <h2>Principles</h2>
+            <ul class="bullet-list">
+                <li>Senior engineers on every project — no juniors, no exceptions.</li>
+                <li>Fixed pricing with clear scope — you know the cost before we start.</li>
+                <li>Ship in days, not weeks — because we've built these systems before.</li>
+                <li>Direct communication — you talk to the people writing the code.</li>
+                <li>Clean handoffs — documented, deployed, and ready for the next person.</li>
+                <li>Honest about fit — if we're not the right team for your project, we'll say so.</li>
+                <li>AI-augmented by default — modern tooling is part of how we work, not an upsell.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="section section-cta">
+        <div class="container">
+            <h2>Work with us.</h2>
+            <a href="/contact" class="btn btn-primary btn-lg">Get Started</a>
+        </div>
+    </section>
+{% endblock %}

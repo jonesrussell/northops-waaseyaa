@@ -33,6 +33,23 @@ final class MarketingController
         return $this->twig()->render('home.html.twig');
     }
 
+    public function about(): string
+    {
+        return $this->twig()->render('about.html.twig');
+    }
+
+    public function servicesIndex(): string
+    {
+        return $this->twig()->render('services/index.html.twig');
+    }
+
+    public function serviceDetail(string $slug): string
+    {
+        $template = "services/{$slug}.html.twig";
+
+        return $this->twig()->render($template);
+    }
+
     public function contact(Request $request): string
     {
         $status = $request->query->get('status');
@@ -83,6 +100,6 @@ final class MarketingController
         $storage = $this->entityTypeManager->getStorage('contact_submission');
         $storage->save($submission);
 
-        return new RedirectResponse('/contact?status=' . urlencode('Thanks! We\'ll be in touch soon.'));
+        return new RedirectResponse('/contact?status=success');
     }
 }

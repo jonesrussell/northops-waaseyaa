@@ -1,50 +1,76 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}NorthOps{% endblock %}</title>
-    <meta name="description" content="{% block description %}Fractional senior engineering for agencies and startups. Pipelines, Laravel, WordPress, and full-stack PHP builds. Based in Sudbury, ON.{% endblock %}">
-    <link rel="icon" href="/favicon.ico">
+    <meta name="description" content="{% block description %}Senior engineering. Shipped in days.{% endblock %}">
+
+    <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <meta property="og:title" content="{% block og_title %}NorthOps — Senior Engineering, When You Need It{% endblock %}">
-    <meta property="og:description" content="Fractional senior engineering for agencies and startups.">
-    <meta property="og:image" content="/images/og-image.png">
     <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}NorthOps{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Senior engineering. Shipped in days.{% endblock %}">
+    <meta property="og:image" content="/images/og-image.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/northops.css">
 </head>
 <body>
-    {% block body %}
-    <nav>
-        <div class="container nav-inner">
-            <a href="/" class="logo">North<span>Ops</span></a>
-            {% block nav_links %}
-            <ul class="nav-links">
-                <li><a href="/#audiences">Who we serve</a></li>
-                <li><a href="/#services">Services</a></li>
-                <li><a href="/#pricing">Pricing</a></li>
-                <li><a href="/#about">About</a></li>
-                <li><a href="/contact">Contact</a></li>
-            </ul>
-            {% endblock %}
-            <a href="/#cta" class="btn btn-primary">Book a call</a>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="wordmark">NorthOps</a>
+            <nav class="header-nav">
+                <a href="/services">Services</a>
+                <a href="/about">About</a>
+                <a href="/contact" class="btn btn-primary">Get Started</a>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    {% block content %}{% endblock %}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
 
-    <footer>
-        <div class="container footer-inner">
-            <a href="/" class="footer-logo">North<span>Ops</span></a>
-            <ul class="footer-links">
-                <li><a href="/#services">Services</a></li>
-                <li><a href="/#pricing">Pricing</a></li>
-                <li><a href="/#about">About</a></li>
-                <li><a href="/contact">hello@northops.ca</a></li>
-            </ul>
-            <div class="footer-copy">&copy; 2026 NorthOps &middot; northops.ca</div>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-brand">
+                    <a href="/" class="wordmark">NorthOps</a>
+                    <p class="footer-tagline">Senior engineering. Shipped in days.</p>
+                    <p class="footer-meta">Northern Ontario, Canada</p>
+                    <p class="footer-meta"><a href="mailto:contact@northops.ca">contact@northops.ca</a></p>
+                </div>
+                <div class="footer-col">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="/services/web-application-engineering">Web Application Engineering</a></li>
+                        <li><a href="/services/content-data-pipelines">Content &amp; Data Pipelines</a></li>
+                        <li><a href="/services/devops-cicd">DevOps &amp; CI/CD</a></li>
+                        <li><a href="/services/ai-engineering">AI Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://github.com/northops-ca" target="_blank" rel="noopener">GitHub</a></li>
+                        <li><a href="https://linkedin.com/company/northops" target="_blank" rel="noopener">LinkedIn</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <a href="/privacy">Privacy</a>
+            </div>
         </div>
     </footer>
-    {% endblock %}
 </body>
 </html>

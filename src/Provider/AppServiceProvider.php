@@ -41,6 +41,42 @@ final class AppServiceProvider extends ServiceProvider
         );
 
         $router->addRoute(
+            'marketing.about',
+            RouteBuilder::create('/about')
+                ->controller(fn () => new SsrResponse($this->controller()->about()))
+                ->allowAll()
+                ->methods('GET')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'marketing.services',
+            RouteBuilder::create('/services')
+                ->controller(fn () => new SsrResponse($this->controller()->servicesIndex()))
+                ->allowAll()
+                ->methods('GET')
+                ->build(),
+        );
+
+        $validServices = [
+            'web-application-engineering',
+            'content-data-pipelines',
+            'devops-cicd',
+            'ai-engineering',
+        ];
+
+        foreach ($validServices as $slug) {
+            $router->addRoute(
+                "marketing.services.{$slug}",
+                RouteBuilder::create("/services/{$slug}")
+                    ->controller(fn () => new SsrResponse($this->controller()->serviceDetail($slug)))
+                    ->allowAll()
+                    ->methods('GET')
+                    ->build(),
+            );
+        }
+
+        $router->addRoute(
             'marketing.contact',
             RouteBuilder::create('/contact')
                 ->controller(function () {

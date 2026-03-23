@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Page Not Found — NorthOps</title>
+    <title>{% block title %}NorthOps{% endblock %}</title>
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -21,15 +21,7 @@
     </header>
 
     <main class="utility-main">
-        <div class="container utility-center">
-            <h1>Page not found.</h1>
-            <p>The page you're looking for doesn't exist or has been moved.</p>
-            <nav class="utility-nav">
-                <a href="/">Home</a>
-                <a href="/services">Services</a>
-                <a href="/contact">Contact</a>
-            </nav>
-        </div>
+        {% block content %}{% endblock %}
     </main>
 </body>
 </html>

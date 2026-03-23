@@ -1,33 +1,34 @@
 {% extends "base.html.twig" %}
 
 {% block title %}Contact — NorthOps{% endblock %}
-
-{% block nav_links %}
-<ul class="nav-links">
-    <li><a href="/">Home</a></li>
-</ul>
-{% endblock %}
+{% block description %}Get in touch with NorthOps. Book a free discovery call or send us a message about your project.{% endblock %}
 
 {% block content %}
-<div class="contact-page">
-    <main class="section">
-        <div class="container contact-main">
-            <div class="contact-header">
-                <div class="tag">Contact</div>
-                <h1>Get in touch</h1>
-                <p class="contact-desc">
-                    Send us a message and we'll get back to you as soon as we can.
-                </p>
-            </div>
+    <!-- Page Intro -->
+    <section class="section section-hero">
+        <div class="container">
+            <h1>Let's talk about your project.</h1>
+        </div>
+    </section>
 
-            {% if status is defined and status %}
-            <div class="contact-status">
-                {{ status }}
+    <!-- Contact Form -->
+    <section class="section">
+        <div class="container container-narrow">
+            {% if status is defined and status == 'success' %}
+            <div class="alert alert-success">
+                Your message has been sent. We'll get back to you within one business day.
+            </div>
+            {% endif %}
+
+            {% if status is defined and status == 'error' %}
+            <div class="alert alert-error">
+                Something went wrong. Please try again or email us directly at contact@northops.ca.
             </div>
             {% endif %}
 
             <form class="contact-form" method="post" action="/contact">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
                 <div class="form-group">
                     <label for="name" class="form-label">Name</label>
                     <input
@@ -71,7 +72,7 @@
                         required
                         rows="6"
                         maxlength="5000"
-                        placeholder="Your message..."
+                        placeholder="Tell us about your project..."
                         class="form-textarea"
                     >{{ old.message|default('') }}</textarea>
                     {% if errors.message is defined %}
@@ -79,9 +80,43 @@
                     {% endif %}
                 </div>
 
-                <button type="submit" class="btn-submit">Send message</button>
+                <button type="submit" class="btn btn-primary">Send Message</button>
             </form>
         </div>
-    </main>
-</div>
+    </section>
+
+    <!-- Contact Info -->
+    <section class="section section-alt">
+        <div class="container container-narrow">
+            <div class="contact-info-grid">
+                <div class="contact-info-item">
+                    <h3>Email</h3>
+                    <p><a href="mailto:contact@northops.ca">contact@northops.ca</a></p>
+                </div>
+                <div class="contact-info-item">
+                    <h3>Location</h3>
+                    <p>Northern Ontario, Canada</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Text Block -->
+    <section class="section">
+        <div class="container container-narrow">
+            <p class="text-block">
+                Free 15–30 minute discovery call. No pitch, no commitment — just a straightforward conversation
+                about what you're building, what you need, and whether NorthOps is the right fit. If we're not,
+                we'll tell you.
+            </p>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="section section-cta">
+        <div class="container">
+            <h2>Book a discovery call.</h2>
+            <a href="/contact" class="btn btn-primary btn-lg">Get Started</a>
+        </div>
+    </section>
 {% endblock %}

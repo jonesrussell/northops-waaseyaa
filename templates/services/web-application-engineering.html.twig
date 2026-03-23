@@ -1,0 +1,100 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Web Application Engineering — NorthOps{% endblock %}
+{% block description %}Full-stack Laravel and Vue web applications scoped, built, and shipped as a working product. Fixed-price MVPs starting at CAD $6,000.{% endblock %}
+
+{% block content %}
+    <!-- Hero -->
+    <section class="section section-hero">
+        <div class="container">
+            <h1>Web Application Engineering</h1>
+            <p class="hero-sub">
+                Full-stack Laravel and Vue applications scoped, built, and shipped as a working product.
+                Includes authentication, admin interfaces, deployment, and documentation.
+            </p>
+        </div>
+    </section>
+
+    <!-- Deliverables -->
+    <section class="section">
+        <div class="container container-narrow">
+            <h2>Deliverables</h2>
+            <ul class="bullet-list">
+                <li>Production-ready Laravel application with database schema and migrations</li>
+                <li>Vue 3 frontend with TypeScript and responsive Tailwind CSS styling</li>
+                <li>Authentication system with registration, login, password reset, and optional 2FA</li>
+                <li>Admin interface for content and user management</li>
+                <li>Deployment configuration with zero-downtime deploys and SSL</li>
+                <li>Technical documentation covering architecture, deployment, and maintenance</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- MVP Block -->
+    <section class="section section-alt">
+        <div class="container container-narrow">
+            <h2>MVP scope</h2>
+            <div class="mvp-block">
+                <div class="mvp-detail">
+                    <span class="mvp-label">Delivery</span>
+                    <span class="mvp-value">5 business days</span>
+                </div>
+                <div class="mvp-detail">
+                    <span class="mvp-label">Price</span>
+                    <span class="mvp-value">CAD $6,000–$7,200</span>
+                </div>
+                <div class="mvp-detail">
+                    <span class="mvp-label">Payment</span>
+                    <span class="mvp-value">50% upfront, 50% on delivery</span>
+                </div>
+            </div>
+            <p class="mvp-assumptions">
+                Assumes a single application with up to 5 core models, standard auth, one admin role,
+                and deployment to a single environment. Additional complexity (multi-tenancy, third-party
+                integrations, custom reporting) is scoped separately.
+            </p>
+        </div>
+    </section>
+
+    <!-- Stack -->
+    <section class="section">
+        <div class="container container-narrow">
+            <h2>Stack</h2>
+            <div class="tag-list">
+                <span class="tag">Laravel</span>
+                <span class="tag">PHP 8.4</span>
+                <span class="tag">Vue 3</span>
+                <span class="tag">TypeScript</span>
+                <span class="tag">Inertia.js</span>
+                <span class="tag">Tailwind CSS</span>
+                <span class="tag">SQLite</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Redis</span>
+                <span class="tag">Caddy</span>
+                <span class="tag">Deployer</span>
+                <span class="tag">GitHub Actions</span>
+                <span class="tag">Linux</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ideal Client -->
+    <section class="section section-alt">
+        <div class="container container-narrow">
+            <h2>Ideal client</h2>
+            <p class="text-block">
+                You need a web application built properly from the start — with clean architecture,
+                authentication, and deployment — but you don't have the team or the time to do it
+                in-house. You want a working product in days, not a wireframe deck in weeks.
+            </p>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="section section-cta">
+        <div class="container">
+            <h2>Ready to build your web application?</h2>
+            <a href="/contact" class="btn btn-primary btn-lg">Get Started</a>
+        </div>
+    </section>
+{% endblock %}

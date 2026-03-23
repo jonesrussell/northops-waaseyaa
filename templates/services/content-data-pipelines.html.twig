@@ -1,0 +1,95 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Content &amp; Data Pipelines — NorthOps{% endblock %}
+{% block description %}Automated ingestion, transformation, and delivery pipelines. Fixed-price MVPs starting at CAD $4,800.{% endblock %}
+
+{% block content %}
+    <!-- Hero -->
+    <section class="section section-hero">
+        <div class="container">
+            <h1>Content &amp; Data Pipelines</h1>
+            <p class="hero-sub">
+                Automated ingestion, transformation, and delivery pipelines that move data where
+                it needs to go — reliably and on schedule.
+            </p>
+        </div>
+    </section>
+
+    <!-- Deliverables -->
+    <section class="section">
+        <div class="container container-narrow">
+            <h2>Deliverables</h2>
+            <ul class="bullet-list">
+                <li>Data ingestion pipeline with source connectors and scheduling</li>
+                <li>Transformation layer with validation, normalization, and enrichment</li>
+                <li>Output delivery to target systems (databases, APIs, file stores, queues)</li>
+                <li>Monitoring dashboard with pipeline health, throughput, and error tracking</li>
+                <li>Technical documentation covering pipeline architecture and operational runbooks</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- MVP Block -->
+    <section class="section section-alt">
+        <div class="container container-narrow">
+            <h2>MVP scope</h2>
+            <div class="mvp-block">
+                <div class="mvp-detail">
+                    <span class="mvp-label">Delivery</span>
+                    <span class="mvp-value">4 business days</span>
+                </div>
+                <div class="mvp-detail">
+                    <span class="mvp-label">Price</span>
+                    <span class="mvp-value">CAD $4,800–$5,760</span>
+                </div>
+                <div class="mvp-detail">
+                    <span class="mvp-label">Payment</span>
+                    <span class="mvp-value">50% upfront, 50% on delivery</span>
+                </div>
+            </div>
+            <p class="mvp-assumptions">
+                Assumes a single pipeline with up to 3 data sources, standard transformations,
+                and delivery to one target system. Complex ETL logic, real-time streaming, or
+                multi-target fan-out is scoped separately.
+            </p>
+        </div>
+    </section>
+
+    <!-- Stack -->
+    <section class="section">
+        <div class="container container-narrow">
+            <h2>Stack</h2>
+            <div class="tag-list">
+                <span class="tag">Go</span>
+                <span class="tag">Laravel</span>
+                <span class="tag">Redis</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Docker</span>
+                <span class="tag">GitHub Actions</span>
+                <span class="tag">Linux</span>
+                <span class="tag">Horizon</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ideal Client -->
+    <section class="section section-alt">
+        <div class="container container-narrow">
+            <h2>Ideal client</h2>
+            <p class="text-block">
+                You have data trapped in one system that needs to flow to another — or multiple
+                sources that need to be unified, cleaned, and delivered somewhere useful. You
+                need it automated, monitored, and reliable — not a cron job held together with
+                hope.
+            </p>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="section section-cta">
+        <div class="container">
+            <h2>Ready to automate your data pipeline?</h2>
+            <a href="/contact" class="btn btn-primary btn-lg">Get Started</a>
+        </div>
+    </section>
+{% endblock %}
