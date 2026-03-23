@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}NorthOps{% endblock %}</title>
+    <meta name="description" content="{% block description %}Fractional senior engineering for agencies and startups. Pipelines, Laravel, WordPress, and full-stack PHP builds. Based in Sudbury, ON.{% endblock %}">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta property="og:title" content="{% block og_title %}NorthOps — Senior Engineering, When You Need It{% endblock %}">
+    <meta property="og:description" content="Fractional senior engineering for agencies and startups.">
+    <meta property="og:image" content="/images/og-image.png">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="/css/northops.css">
+</head>
+<body>
+    {% block body %}
+    <nav>
+        <div class="container nav-inner">
+            <a href="/" class="logo">North<span>Ops</span></a>
+            {% block nav_links %}
+            <ul class="nav-links">
+                <li><a href="/#audiences">Who we serve</a></li>
+                <li><a href="/#services">Services</a></li>
+                <li><a href="/#pricing">Pricing</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+            {% endblock %}
+            <a href="/#cta" class="btn btn-primary">Book a call</a>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <div class="container footer-inner">
+            <a href="/" class="footer-logo">North<span>Ops</span></a>
+            <ul class="footer-links">
+                <li><a href="/#services">Services</a></li>
+                <li><a href="/#pricing">Pricing</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/contact">hello@northops.ca</a></li>
+            </ul>
+            <div class="footer-copy">&copy; 2026 NorthOps &middot; northops.ca</div>
+        </div>
+    </footer>
+    {% endblock %}
+</body>
+</html>
