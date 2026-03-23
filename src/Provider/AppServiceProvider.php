@@ -6,28 +6,35 @@ namespace App\Provider;
 
 use App\Controller\MarketingController;
 use Symfony\Component\HttpFoundation\Request;
-use Twig\Environment as Twig;
+use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
+use Waaseyaa\SSR\SsrResponse;
 
 final class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void
+    private ?MarketingController $controller = null;
+
+    public function register(): void {}
+
+    private function controller(): MarketingController
     {
-        $this->singleton(MarketingController::class, fn () => new MarketingController(
-            $this->resolve(Twig::class),
-        ));
+        if ($this->controller === null) {
+            $this->controller = new MarketingController(
+                $this->resolve(EntityTypeManager::class),
+            );
+        }
+
+        return $this->controller;
     }
 
-    public function routes(WaaseyaaRouter $router, ?\Waaseyaa\Entity\EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
     {
-        $controller = $this->resolve(MarketingController::class);
-
         $router->addRoute(
             'marketing.home',
             RouteBuilder::create('/')
-                ->controller(fn () => ['type' => 'html', 'status' => 200, 'content' => $controller->home()])
+                ->controller(fn () => new SsrResponse($this->controller()->home()))
                 ->allowAll()
                 ->methods('GET')
                 ->build(),
@@ -36,30 +43,23 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'marketing.contact',
             RouteBuilder::create('/contact')
-                ->controller(function () use ($controller) {
+                ->controller(function () {
                     $request = Request::createFromGlobals();
-                    return ['type' => 'html', 'status' => 200, 'content' => $controller->contact($request)];
-                })
-                ->allowAll()
-                ->methods('GET')
-                ->build(),
-        );
 
-        $router->addRoute(
-            'marketing.contact.submit',
-            RouteBuilder::create('/contact')
-                ->controller(function () use ($controller) {
-                    $request = Request::createFromGlobals();
-                    $result = $controller->submitContact($request);
+                    if ($request->getMethod() === 'POST') {
+                        $result = $this->controller()->submitContact($request);
 
-                    if ($result instanceof \Symfony\Component\HttpFoundation\RedirectResponse) {
-                        return $result;
+                        if ($result instanceof \Symfony\Component\HttpFoundation\RedirectResponse) {
+                            return $result;
+                        }
+
+                        return new SsrResponse($result);
                     }
 
-                    return ['type' => 'html', 'status' => 200, 'content' => $result];
+                    return new SsrResponse($this->controller()->contact($request));
                 })
                 ->allowAll()
-                ->methods('POST')
+                ->methods('GET', 'POST')
                 ->build(),
         );
     }

@@ -4,29 +4,44 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\ContactSubmission;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Twig\Environment as Twig;
+use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\SSR\SsrServiceProvider;
+use Waaseyaa\User\Middleware\CsrfMiddleware;
 
 final class MarketingController
 {
     public function __construct(
-        private readonly Twig $twig,
+        private readonly EntityTypeManager $entityTypeManager,
     ) {}
+
+    private function twig(): Twig
+    {
+        $twig = SsrServiceProvider::getTwigEnvironment();
+        if ($twig === null) {
+            throw new \RuntimeException('Twig environment not initialized');
+        }
+
+        return $twig;
+    }
 
     public function home(): string
     {
-        return $this->twig->render('home.html.twig');
+        return $this->twig()->render('home.html.twig');
     }
 
     public function contact(Request $request): string
     {
         $status = $request->query->get('status');
 
-        return $this->twig->render('contact.html.twig', [
+        return $this->twig()->render('contact.html.twig', [
             'status' => $status,
             'errors' => [],
             'old' => [],
+            'csrf_token' => CsrfMiddleware::token(),
         ]);
     }
 
@@ -51,14 +66,22 @@ final class MarketingController
         }
 
         if ($errors !== []) {
-            return $this->twig->render('contact.html.twig', [
+            return $this->twig()->render('contact.html.twig', [
                 'errors' => $errors,
                 'old' => ['name' => $name, 'email' => $email, 'message' => $message],
                 'status' => null,
+                'csrf_token' => CsrfMiddleware::token(),
             ]);
         }
 
-        // TODO: Store ContactSubmission entity once entity system is wired (Issue #8)
+        $submission = new ContactSubmission([
+            'name' => $name,
+            'email' => $email,
+            'message' => $message,
+        ]);
+
+        $storage = $this->entityTypeManager->getStorage('contact_submission');
+        $storage->save($submission);
 
         return new RedirectResponse('/contact?status=' . urlencode('Thanks! We\'ll be in touch soon.'));
     }

@@ -19,4 +19,11 @@ declare(strict_types=1);
  *   ];
  */
 
-return [];
+return [
+    new \Waaseyaa\Entity\EntityType(
+        id: 'contact_submission',
+        label: 'Contact Submission',
+        class: \App\Entity\ContactSubmission::class,
+        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
+    ),
+];

@@ -1,13 +1,19 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>404 Not Found</title>
-</head>
-<body>
-  <main>
-    <h1>Not Found</h1>
-    <p>{{ path }}</p>
-  </main>
-</body>
-</html>
+{% extends "base.html.twig" %}
+
+{% block title %}Page Not Found — NorthOps{% endblock %}
+
+{% block nav_links %}
+<ul class="nav-links">
+    <li><a href="/">Home</a></li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<section class="section" style="text-align: center; min-height: 50vh; display: flex; align-items: center;">
+    <div class="container">
+        <h1 style="font-size: clamp(36px,5vw,60px); font-weight: 800; color: var(--no-navy); margin-bottom: 16px;">404</h1>
+        <p style="font-size: 18px; color: var(--no-gray); margin-bottom: 32px;">The page you're looking for doesn't exist.</p>
+        <a href="/" class="btn btn-primary btn-lg">Back to home</a>
+    </div>
+</section>
+{% endblock %}
