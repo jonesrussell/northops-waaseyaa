@@ -4,111 +4,103 @@
 {% block description %}Get in touch with NorthOps. Book a free discovery call or send us a message about your project.{% endblock %}
 
 {% block content %}
-    <!-- Page Intro -->
-    <section class="section section-hero">
+    <!-- Contact Layout -->
+    <section class="section section-hero contact-page">
         <div class="container">
             <h1>Let's talk about your project.</h1>
-        </div>
-    </section>
-
-    <!-- Contact Form -->
-    <section class="section">
-        <div class="container container-narrow">
-            {% if status is defined and status == 'success' %}
-            <div class="alert alert-success">
-                Your message has been sent. We'll get back to you within one business day.
-            </div>
-            {% endif %}
-
-            {% if status is defined and status == 'error' %}
-            <div class="alert alert-error">
-                Something went wrong. Please try again or email us directly at contact@northops.ca.
-            </div>
-            {% endif %}
-
-            <form class="contact-form" method="post" action="/contact">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
-
-                <div class="form-group">
-                    <label for="name" class="form-label">Name</label>
-                    <input
-                        id="name"
-                        type="text"
-                        name="name"
-                        required
-                        maxlength="255"
-                        placeholder="Your name"
-                        class="form-input"
-                        value="{{ old.name|default('') }}"
-                    >
-                    {% if errors.name is defined %}
-                    <div class="form-error">{{ errors.name }}</div>
+            <div class="contact-layout">
+                <!-- Left: Form -->
+                <div class="contact-form-col">
+                    {% if status is defined and status == 'success' %}
+                    <div class="alert alert-success">
+                        Your message has been sent. We'll get back to you within one business day.
+                    </div>
                     {% endif %}
-                </div>
 
-                <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        required
-                        maxlength="255"
-                        autocomplete="email"
-                        placeholder="you@example.com"
-                        class="form-input"
-                        value="{{ old.email|default('') }}"
-                    >
-                    {% if errors.email is defined %}
-                    <div class="form-error">{{ errors.email }}</div>
+                    {% if status is defined and status == 'error' %}
+                    <div class="alert alert-error">
+                        Something went wrong. Please try again or email us directly at contact@northops.ca.
+                    </div>
                     {% endif %}
+
+                    <form class="contact-form" method="post" action="/contact">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+                        <div class="form-group">
+                            <label for="name" class="form-label">Name</label>
+                            <input
+                                id="name"
+                                type="text"
+                                name="name"
+                                required
+                                maxlength="255"
+                                placeholder="Your name"
+                                class="form-input"
+                                value="{{ old.name|default('') }}"
+                            >
+                            {% if errors.name is defined %}
+                            <div class="form-error">{{ errors.name }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input
+                                id="email"
+                                type="email"
+                                name="email"
+                                required
+                                maxlength="255"
+                                autocomplete="email"
+                                placeholder="you@example.com"
+                                class="form-input"
+                                value="{{ old.email|default('') }}"
+                            >
+                            {% if errors.email is defined %}
+                            <div class="form-error">{{ errors.email }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea
+                                id="message"
+                                name="message"
+                                required
+                                rows="6"
+                                maxlength="5000"
+                                placeholder="Tell us about your project..."
+                                class="form-textarea"
+                            >{{ old.message|default('') }}</textarea>
+                            {% if errors.message is defined %}
+                            <div class="form-error">{{ errors.message }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
                 </div>
 
-                <div class="form-group">
-                    <label for="message" class="form-label">Message</label>
-                    <textarea
-                        id="message"
-                        name="message"
-                        required
-                        rows="6"
-                        maxlength="5000"
-                        placeholder="Tell us about your project..."
-                        class="form-textarea"
-                    >{{ old.message|default('') }}</textarea>
-                    {% if errors.message is defined %}
-                    <div class="form-error">{{ errors.message }}</div>
-                    {% endif %}
-                </div>
-
-                <button type="submit" class="btn btn-primary">Send Message</button>
-            </form>
-        </div>
-    </section>
-
-    <!-- Contact Info -->
-    <section class="section section-alt">
-        <div class="container container-narrow">
-            <div class="contact-info-grid">
-                <div class="contact-info-item">
-                    <h3>Email</h3>
-                    <p><a href="mailto:contact@northops.ca">contact@northops.ca</a></p>
-                </div>
-                <div class="contact-info-item">
-                    <h3>Location</h3>
-                    <p>Northern Ontario, Canada</p>
+                <!-- Right: Info -->
+                <div class="contact-info-col">
+                    <div class="contact-info-item">
+                        <h3>Email</h3>
+                        <p><a href="mailto:contact@northops.ca">contact@northops.ca</a></p>
+                    </div>
+                    <div class="contact-info-item">
+                        <h3>Location</h3>
+                        <p>Northern Ontario, Canada</p>
+                    </div>
+                    <div class="contact-info-item">
+                        <h3>Discovery call</h3>
+                        <p>
+                            Free 15–30 minute conversation. No pitch, no commitment.
+                            We'll talk about what you're building, what you need, and whether NorthOps is the right fit.
+                            If we're not, we'll tell you.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Text Block -->
-    <section class="section">
-        <div class="container container-narrow">
-            <p class="text-block">
-                Free 15–30 minute discovery call. No pitch, no commitment — just a straightforward conversation
-                about what you're building, what you need, and whether NorthOps is the right fit. If we're not,
-                we'll tell you.
-            </p>
         </div>
     </section>
 
