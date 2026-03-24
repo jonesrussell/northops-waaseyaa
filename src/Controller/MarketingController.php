@@ -16,6 +16,7 @@ final class MarketingController
 {
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
+        private readonly string $discordWebhookUrl,
     ) {}
 
     private function twig(): Twig
@@ -100,6 +101,40 @@ final class MarketingController
         $storage = $this->entityTypeManager->getStorage('contact_submission');
         $storage->save($submission);
 
+        $this->notifyDiscord($name, $email, $message);
+
         return new RedirectResponse('/contact?status=success');
+    }
+
+    private function notifyDiscord(string $name, string $email, string $message): void
+    {
+        if ($this->discordWebhookUrl === '') {
+            return;
+        }
+
+        $embed = [
+            'title' => 'New Contact Form Submission',
+            'color' => 0x5865F2,
+            'fields' => [
+                ['name' => 'Name', 'value' => $name, 'inline' => true],
+                ['name' => 'Email', 'value' => $email, 'inline' => true],
+                ['name' => 'Message', 'value' => mb_substr($message, 0, 1024)],
+            ],
+            'timestamp' => date('c'),
+        ];
+
+        $payload = json_encode(['embeds' => [$embed]], JSON_THROW_ON_ERROR);
+
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-Type: application/json\r\n",
+                'content' => $payload,
+                'timeout' => 5,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        @file_get_contents($this->discordWebhookUrl, false, $context);
     }
 }

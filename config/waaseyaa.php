@@ -51,6 +51,11 @@ return [
         ],
     ],
 
+    // Discord webhook for contact form notifications.
+    'discord' => [
+        'webhook_url' => getenv('DISCORD_WEBHOOK_URL') ?: '',
+    ],
+
     // SSR theme id discovered from Composer package metadata.
     // Theme packages expose extra.waaseyaa.theme in composer.json.
     'ssr' => [

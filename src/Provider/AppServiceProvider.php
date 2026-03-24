@@ -23,6 +23,7 @@ final class AppServiceProvider extends ServiceProvider
         if ($this->controller === null) {
             $this->controller = new MarketingController(
                 $this->resolve(EntityTypeManager::class),
+                $this->config['discord']['webhook_url'] ?? '',
             );
         }
 
