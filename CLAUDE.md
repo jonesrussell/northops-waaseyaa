@@ -32,7 +32,9 @@ src/
 - **Routes** defined in `ServiceProvider::routes()` via `WaaseyaaRouter`
 - **Auth** via `Waaseyaa\Auth\AuthManager` (session-based)
 - **Config** via `config/waaseyaa.php` — use `getenv()` or `env()` helper, NEVER `$_ENV`
-- **Contact form** saves to `ContactSubmission` entity + sends Discord webhook notification (env: `DISCORD_WEBHOOK_URL`) + auto-creates pipeline Lead
+- **HTTP client** via `waaseyaa/http-client` — all external HTTP calls use injected `HttpClientInterface` (Discord, Anthropic API, north-cloud)
+- **Discord notifications** via `DiscordNotifier` — centralized webhook sender with `sendEmbed()`, used by all event subscribers and controllers
+- **Contact form** saves to `ContactSubmission` entity + sends Discord notification via `DiscordNotifier` + auto-creates pipeline Lead
 - **Lead pipeline** stages: lead → qualified → contacted → proposal → negotiation → won/lost
 - **AI qualification** via Claude API (claude-haiku-4-5) — rates, scores, and categorizes leads
 - **Dual-brand** support via `Brand` entity — NorthOps (default) and Web Networks (finder's fee tracking)
@@ -48,7 +50,8 @@ src/
 | `src/Domain/Pipeline/**` | `feature-dev` | lead-pipeline-design.md |
 | `src/Domain/Qualification/**` | `feature-dev` | lead-pipeline-design.md |
 | `src/Controller/Api/**` | `feature-dev` | lead-pipeline-design.md |
-| `src/Provider/**` | `feature-dev` | — |
+| `src/Support/**` | `feature-dev` | lead-pipeline-design.md |
+| `src/Provider/**` | `feature-dev` | lead-pipeline-design.md |
 | `.claude/rules/**` | `updating-codified-context` | — |
 | `docs/specs/**` | `updating-codified-context` | — |
 
