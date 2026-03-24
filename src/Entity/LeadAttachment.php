@@ -21,6 +21,10 @@ final class LeadAttachment extends ContentEntityBase
      */
     public function __construct(array $values = [])
     {
+        if (!isset($values['created_at'])) {
+            $values['created_at'] = date('c');
+        }
+
         parent::__construct($values, $this->entityTypeId, $this->entityKeys);
     }
 
