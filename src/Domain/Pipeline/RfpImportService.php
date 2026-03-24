@@ -110,6 +110,12 @@ final class RfpImportService
             return null;
         }
 
+        // Check for non-2xx HTTP status.
+        $statusLine = $http_response_header[0] ?? '';
+        if (!preg_match('/\s2\d{2}\s/', $statusLine)) {
+            return null;
+        }
+
         $decoded = json_decode($response, true);
 
         if (!is_array($decoded)) {

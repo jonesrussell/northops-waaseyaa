@@ -224,7 +224,7 @@ final class LeadController
             return new JsonResponse(['error' => $e->getMessage()], 502);
         }
 
-        $this->leadManager->update($lead, [
+        $lead = $this->leadManager->update($lead, [
             'qualify_rating' => $qualification['rating'],
             'qualify_confidence' => $qualification['confidence'],
             'qualify_keywords' => json_encode($qualification['keywords'], JSON_THROW_ON_ERROR),
