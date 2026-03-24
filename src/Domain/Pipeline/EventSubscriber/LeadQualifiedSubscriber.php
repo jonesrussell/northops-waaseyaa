@@ -1,0 +1,69 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domain\Pipeline\EventSubscriber;
+
+use App\Entity\Lead;
+
+final class LeadQualifiedSubscriber
+{
+    public function __construct(
+        private readonly string $discordWebhookUrl,
+    ) {}
+
+    /**
+     * @param array{rating: int, keywords: string[], sector: ?string, summary: ?string, confidence: float, raw: string} $qualificationResult
+     */
+    public function handle(Lead $lead, array $qualificationResult): void
+    {
+        $this->notifyDiscord($lead, $qualificationResult);
+    }
+
+    /**
+     * @param array{rating: int, keywords: string[], sector: ?string, summary: ?string, confidence: float, raw: string} $qualificationResult
+     */
+    private function notifyDiscord(Lead $lead, array $qualificationResult): void
+    {
+        if ($this->discordWebhookUrl === '') {
+            return;
+        }
+
+        $rating = $qualificationResult['rating'];
+        $color = match (true) {
+            $rating >= 70 => 0x57F287,  // Green — strong lead
+            $rating >= 40 => 0xFEE75C,  // Yellow — moderate
+            default => 0xED4245,         // Red — weak
+        };
+
+        $keywords = implode(', ', $qualificationResult['keywords']);
+
+        $embed = [
+            'title' => 'Lead Qualified',
+            'color' => $color,
+            'fields' => [
+                ['name' => 'Lead', 'value' => mb_substr($lead->getLabel(), 0, 1024) ?: '(none)', 'inline' => false],
+                ['name' => 'Rating', 'value' => (string) $rating . '/100', 'inline' => true],
+                ['name' => 'Confidence', 'value' => number_format($qualificationResult['confidence'], 2), 'inline' => true],
+                ['name' => 'Sector', 'value' => $qualificationResult['sector'] ?? '(none)', 'inline' => true],
+                ['name' => 'Keywords', 'value' => $keywords ?: '(none)', 'inline' => false],
+                ['name' => 'Summary', 'value' => mb_substr($qualificationResult['summary'] ?? '', 0, 1024) ?: '(none)', 'inline' => false],
+            ],
+            'timestamp' => date('c'),
+        ];
+
+        $payload = json_encode(['embeds' => [$embed]], JSON_THROW_ON_ERROR);
+
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-Type: application/json\r\n",
+                'content' => $payload,
+                'timeout' => 5,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        @file_get_contents($this->discordWebhookUrl, false, $context);
+    }
+}
