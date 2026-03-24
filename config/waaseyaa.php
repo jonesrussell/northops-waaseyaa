@@ -56,6 +56,15 @@ return [
         'webhook_url' => getenv('DISCORD_WEBHOOK_URL') ?: '',
     ],
 
+    // Lead pipeline configuration.
+    'pipeline' => [
+        'anthropic_api_key' => getenv('ANTHROPIC_API_KEY') ?: '',
+        'northcloud_url' => getenv('NORTHCLOUD_URL') ?: 'http://localhost:8090',
+        'company_profile' => getenv('COMPANY_PROFILE') ?: 'NorthOps — DevOps, CI/CD, AI Engineering, Web Application Engineering',
+        'default_brand' => 'northops',
+        'api_key' => getenv('PIPELINE_API_KEY') ?: '',
+    ],
+
     // SSR theme id discovered from Composer package metadata.
     // Theme packages expose extra.waaseyaa.theme in composer.json.
     'ssr' => [
