@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Domain\Pipeline\LeadFactory;
 use App\Entity\ContactSubmission;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,8 @@ final class MarketingController
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
         private readonly string $discordWebhookUrl,
+        private readonly ?LeadFactory $leadFactory = null,
+        private readonly ?int $defaultBrandId = null,
     ) {}
 
     private function twig(): Twig
@@ -102,8 +105,22 @@ final class MarketingController
         $storage->save($submission);
 
         $this->notifyDiscord($name, $email, $message);
+        $this->createLeadFromSubmission($submission);
 
         return new RedirectResponse('/contact?status=success');
+    }
+
+    private function createLeadFromSubmission(ContactSubmission $submission): void
+    {
+        if ($this->leadFactory === null || $this->defaultBrandId === null) {
+            return;
+        }
+
+        try {
+            $this->leadFactory->fromContactSubmission($submission, $this->defaultBrandId);
+        } catch (\Throwable) {
+            // Lead creation is non-blocking — contact form submission succeeds regardless
+        }
     }
 
     private function notifyDiscord(string $name, string $email, string $message): void

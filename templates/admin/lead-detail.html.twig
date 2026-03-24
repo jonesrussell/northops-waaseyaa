@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lead Detail — NorthOps{% endblock %}
+
+{% block content %}
+<div class="dashboard" data-page="lead-detail" data-lead-id="{{ lead_id }}">
+    <div class="dashboard-header">
+        <div class="detail-breadcrumb">
+            <a href="/admin">&larr; Pipeline</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="/admin/leads">Leads</a>
+            <span class="breadcrumb-sep">/</span>
+            <span id="detail-label">Loading...</span>
+        </div>
+        <div class="dashboard-actions">
+            <button class="btn" id="qualify-btn">Qualify</button>
+            <button class="btn btn-primary" id="save-lead-btn">Save Changes</button>
+        </div>
+    </div>
+
+    <div class="detail-layout">
+        <!-- Left column: lead fields -->
+        <div class="detail-main">
+            <div class="detail-header" id="detail-header">
+                <h1 id="detail-title">Loading...</h1>
+                <div class="detail-badges">
+                    <span class="stage-badge" id="detail-stage"></span>
+                    <span class="brand-tag" id="detail-brand-tag"></span>
+                </div>
+            </div>
+
+            <!-- Stage change buttons -->
+            <div class="stage-actions" id="stage-actions">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Qualification results -->
+            <div class="qualification-panel" id="qualification-panel" style="display:none;">
+                <h3>Qualification</h3>
+                <div class="qual-score" id="qual-score"></div>
+                <div class="qual-reasoning" id="qual-reasoning"></div>
+            </div>
+
+            <!-- Editable fields -->
+            <form id="lead-edit-form" class="detail-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-label">Name / Title</label>
+                        <input type="text" id="edit-label" name="label">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-company">Company</label>
+                        <input type="text" id="edit-company" name="company_name">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-contact-name">Contact Name</label>
+                        <input type="text" id="edit-contact-name" name="contact_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-contact-email">Contact Email</label>
+                        <input type="email" id="edit-contact-email" name="contact_email">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-brand">Brand</label>
+                        <select id="edit-brand" name="brand_id"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-source">Source</label>
+                        <select id="edit-source" name="source"></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-sector">Sector</label>
+                        <select id="edit-sector" name="sector"><option value="">—</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-value">Deal Value ($)</label>
+                        <input type="number" id="edit-value" name="value" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-closing-date">Closing Date</label>
+                        <input type="date" id="edit-closing-date" name="closing_date">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-contact-phone">Contact Phone</label>
+                        <input type="tel" id="edit-contact-phone" name="contact_phone">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-description">Description</label>
+                    <textarea id="edit-description" name="description" rows="4"></textarea>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right column: activity timeline -->
+        <div class="detail-sidebar">
+            <div class="activity-section">
+                <h3>Activity</h3>
+                <form id="add-note-form" class="note-form">
+                    <textarea id="note-body" name="body" placeholder="Add a note..." rows="3" required></textarea>
+                    <div class="form-row">
+                        <select id="note-type" name="type">
+                            <option value="note">Note</option>
+                            <option value="call">Call</option>
+                            <option value="email">Email</option>
+                            <option value="meeting">Meeting</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                    </div>
+                </form>
+                <div class="activity-timeline" id="activity-timeline">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/css/dashboard.css">
+<script src="/js/dashboard.js"></script>
+{% endblock %}

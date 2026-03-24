@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Settings — NorthOps{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Settings</h1>
+        <div class="dashboard-actions">
+            <a href="/admin" class="btn">Back to Pipeline</a>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h2>Brands</h2>
+        <div class="brand-list" id="brand-list">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h2>Pipeline Configuration</h2>
+        <div class="config-display" id="config-display">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/css/dashboard.css">
+<script src="/js/dashboard.js"></script>
+{% endblock %}

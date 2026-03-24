@@ -26,4 +26,28 @@ return [
         class: \App\Entity\ContactSubmission::class,
         keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
     ),
+    new \Waaseyaa\Entity\EntityType(
+        id: 'brand',
+        label: 'Brand',
+        class: \App\Entity\Brand::class,
+        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
+    ),
+    new \Waaseyaa\Entity\EntityType(
+        id: 'lead',
+        label: 'Lead',
+        class: \App\Entity\Lead::class,
+        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label'],
+    ),
+    new \Waaseyaa\Entity\EntityType(
+        id: 'lead_activity',
+        label: 'Lead Activity',
+        class: \App\Entity\LeadActivity::class,
+        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'action'],
+    ),
+    new \Waaseyaa\Entity\EntityType(
+        id: 'lead_attachment',
+        label: 'Lead Attachment',
+        class: \App\Entity\LeadAttachment::class,
+        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'filename'],
+    ),
 ];
