@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Pipeline;
 
+use App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber;
+use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
 use App\Entity\Lead;
 use Waaseyaa\Entity\EntityTypeManager;
 
@@ -11,6 +13,8 @@ final class LeadManager
 {
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
+        private readonly ?LeadCreatedSubscriber $leadCreatedSubscriber = null,
+        private readonly ?StageChangedSubscriber $stageChangedSubscriber = null,
     ) {}
 
     /**
@@ -32,6 +36,8 @@ final class LeadManager
 
         $lead = new Lead($data);
         $this->entityTypeManager->getStorage('lead')->save($lead);
+
+        $this->leadCreatedSubscriber?->handle($lead);
 
         return $lead;
     }
@@ -86,6 +92,8 @@ final class LeadManager
         $lead->set('stage_changed_at', date('c'));
         $lead->set('updated_at', date('c'));
         $this->entityTypeManager->getStorage('lead')->save($lead);
+
+        $this->stageChangedSubscriber?->handle($lead, $currentStage, $newStage);
 
         return $lead;
     }

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
+use App\Domain\Pipeline\EventSubscriber\LeadQualifiedSubscriber;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
+use App\Domain\Pipeline\RfpImportService;
 use App\Domain\Pipeline\StageTransitionRules;
 use App\Domain\Qualification\QualificationService;
 use App\Domain\Qualification\SectorNormalizer;
@@ -26,6 +28,8 @@ final class LeadController
         private readonly LeadManager $leadManager,
         private readonly LeadFactory $leadFactory,
         private readonly QualificationService $qualificationService,
+        private readonly RfpImportService $rfpImportService,
+        private readonly ?LeadQualifiedSubscriber $leadQualifiedSubscriber,
         private readonly array $config,
     ) {}
 
@@ -223,11 +227,13 @@ final class LeadController
         $this->leadManager->update($lead, [
             'qualify_rating' => $qualification['rating'],
             'qualify_confidence' => $qualification['confidence'],
-            'qualify_keywords' => implode(', ', $qualification['keywords']),
+            'qualify_keywords' => json_encode($qualification['keywords'], JSON_THROW_ON_ERROR),
             'qualify_notes' => $qualification['summary'] ?? '',
             'qualify_raw' => $qualification['raw'],
             'sector' => $qualification['sector'] ?? $lead->getSector(),
         ]);
+
+        $this->leadQualifiedSubscriber?->handle($lead, $qualification);
 
         return new JsonResponse($qualification);
     }
@@ -363,53 +369,21 @@ final class LeadController
             return new JsonResponse(['error' => 'Unauthorized.'], 401);
         }
 
-        $northcloudUrl = $this->config['pipeline']['northcloud_url'] ?? '';
-        if ($northcloudUrl === '') {
-            return new JsonResponse(['error' => 'North-cloud URL not configured.'], 500);
-        }
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'GET',
-                'header' => "Accept: application/json\r\n",
-                'timeout' => 30,
-                'ignore_errors' => true,
-            ],
-        ]);
-
-        $response = @file_get_contents($northcloudUrl . '/api/search/rfp', false, $context);
-
-        if ($response === false) {
-            return new JsonResponse(['error' => 'Failed to connect to north-cloud.'], 502);
-        }
-
-        $rfpResults = json_decode($response, true);
-        if (!is_array($rfpResults)) {
-            return new JsonResponse(['error' => 'Invalid response from north-cloud.'], 502);
-        }
-
-        // Determine default brand ID.
         $defaultBrandSlug = $this->config['pipeline']['default_brand'] ?? 'northops';
         $brandId = $this->resolveDefaultBrandId($defaultBrandSlug);
 
-        $imported = 0;
-        $skipped = 0;
-
-        foreach ($rfpResults as $rfp) {
-            if (!is_array($rfp)) {
-                $skipped++;
-                continue;
-            }
-
-            $lead = $this->leadFactory->fromRfpImport($rfp, $brandId);
-            if ($lead === null) {
-                $skipped++;
-            } else {
-                $imported++;
-            }
+        $days = (int) ($request->query->get('days', '7'));
+        if ($days < 1 || $days > 365) {
+            $days = 7;
         }
 
-        return new JsonResponse(['imported' => $imported, 'skipped' => $skipped]);
+        try {
+            $stats = $this->rfpImportService->import($brandId, $days);
+        } catch (\Throwable $e) {
+            return new JsonResponse(['error' => 'Import failed: ' . $e->getMessage()], 502);
+        }
+
+        return new JsonResponse($stats);
     }
 
     // ---------------------------------------------------------------

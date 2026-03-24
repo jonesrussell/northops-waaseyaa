@@ -7,8 +7,12 @@ namespace App\Provider;
 use App\Controller\Api\LeadController;
 use App\Controller\DashboardController;
 use App\Controller\MarketingController;
+use App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber;
+use App\Domain\Pipeline\EventSubscriber\LeadQualifiedSubscriber;
+use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
+use App\Domain\Pipeline\RfpImportService;
 use App\Domain\Qualification\CompanyProfile;
 use App\Domain\Qualification\QualificationService;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,15 +34,18 @@ final class AppServiceProvider extends ServiceProvider
     {
         if ($this->controller === null) {
             $etm = $this->resolve(EntityTypeManager::class);
-            $leadManager = new LeadManager($etm);
+            $discordUrl = $this->config['discord']['webhook_url'] ?? '';
+
+            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordUrl);
+            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordUrl);
+            $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
             $leadFactory = new LeadFactory($leadManager, $etm);
 
-            // Resolve default brand ID from config slug
             $defaultBrandId = $this->resolveDefaultBrandId($etm);
 
             $this->controller = new MarketingController(
                 $etm,
-                $this->config['discord']['webhook_url'] ?? '',
+                $discordUrl,
                 $leadFactory,
                 $defaultBrandId,
             );
@@ -52,13 +59,12 @@ final class AppServiceProvider extends ServiceProvider
         $defaultSlug = $this->config['pipeline']['default_brand'] ?? 'northops';
 
         try {
-            $query = $etm->getStorage('brand')->getQuery();
-            $query->condition('slug', $defaultSlug);
-            $brands = $query->execute();
+            $ids = $etm->getStorage('brand')->getQuery()
+                ->condition('slug', $defaultSlug)
+                ->execute();
 
-            if (!empty($brands)) {
-                $brand = reset($brands);
-                return (int) $brand->get('id');
+            if ($ids !== []) {
+                return (int) reset($ids);
             }
         } catch (\Throwable) {
             // Brand table may not exist yet during initial setup
@@ -80,11 +86,22 @@ final class AppServiceProvider extends ServiceProvider
     {
         if ($this->apiController === null) {
             $etm = $this->resolve(EntityTypeManager::class);
-            $leadManager = new LeadManager($etm);
+            $discordUrl = $this->config['discord']['webhook_url'] ?? '';
+
+            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordUrl);
+            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordUrl);
+            $leadQualifiedSubscriber = new LeadQualifiedSubscriber($etm, $discordUrl);
+            $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
             $leadFactory = new LeadFactory($leadManager, $etm);
+
             $qualificationService = new QualificationService(
                 $this->config['pipeline']['anthropic_api_key'] ?? '',
                 new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
+            );
+
+            $rfpImportService = new RfpImportService(
+                $leadFactory,
+                $this->config['pipeline']['northcloud_url'] ?? '',
             );
 
             $this->apiController = new LeadController(
@@ -92,6 +109,8 @@ final class AppServiceProvider extends ServiceProvider
                 $leadManager,
                 $leadFactory,
                 $qualificationService,
+                $rfpImportService,
+                $leadQualifiedSubscriber,
                 $this->config,
             );
         }

@@ -51,11 +51,11 @@ final class LeadFactory
 
         $sector = SectorNormalizer::normalize($rfpData['sector'] ?? null);
 
-        return $this->leadManager->create([
+        $data = [
             'label' => $rfpData['label'] ?? $rfpData['title'] ?? 'RFP Import',
             'brand_id' => $brandId,
             'source' => 'rfp',
-            'stage' => 'lead',
+            'stage' => $rfpData['stage'] ?? 'lead',
             'external_id' => $externalId,
             'sector' => $sector,
             'contact_name' => $rfpData['contact_name'] ?? '',
@@ -63,8 +63,16 @@ final class LeadFactory
             'company_name' => $rfpData['company_name'] ?? '',
             'source_url' => $rfpData['source_url'] ?? '',
             'value' => $rfpData['value'] ?? '',
+            'closing_date' => $rfpData['closing_date'] ?? '',
             'draft_pdf_markdown' => $rfpData['description'] ?? '',
-        ]);
+        ];
+
+        // Pre-populate qualification rating from north-cloud quality score.
+        if (isset($rfpData['qualify_rating']) && is_numeric($rfpData['qualify_rating'])) {
+            $data['qualify_rating'] = (int) $rfpData['qualify_rating'];
+        }
+
+        return $this->leadManager->create($data);
     }
 
     /**

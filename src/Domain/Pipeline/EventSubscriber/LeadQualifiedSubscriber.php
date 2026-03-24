@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Domain\Pipeline\EventSubscriber;
 
 use App\Entity\Lead;
+use App\Entity\LeadActivity;
+use Waaseyaa\Entity\EntityTypeManager;
 
 final class LeadQualifiedSubscriber
 {
     public function __construct(
+        private readonly EntityTypeManager $entityTypeManager,
         private readonly string $discordWebhookUrl,
     ) {}
 
@@ -17,7 +20,27 @@ final class LeadQualifiedSubscriber
      */
     public function handle(Lead $lead, array $qualificationResult): void
     {
+        $this->recordActivity($lead, $qualificationResult);
         $this->notifyDiscord($lead, $qualificationResult);
+    }
+
+    /**
+     * @param array{rating: int, keywords: string[], sector: ?string, summary: ?string, confidence: float, raw: string} $qualificationResult
+     */
+    private function recordActivity(Lead $lead, array $qualificationResult): void
+    {
+        $activity = new LeadActivity([
+            'lead_id' => $lead->get('id'),
+            'user_id' => 'system',
+            'action' => 'qualification',
+            'payload' => json_encode([
+                'rating' => $qualificationResult['rating'],
+                'sector' => $qualificationResult['sector'],
+                'confidence' => $qualificationResult['confidence'],
+            ], JSON_THROW_ON_ERROR),
+        ]);
+
+        $this->entityTypeManager->getStorage('lead_activity')->save($activity);
     }
 
     /**
