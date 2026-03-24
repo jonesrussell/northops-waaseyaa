@@ -41,8 +41,10 @@ final class LeadFactory
         $externalId = $rfpData['external_id'] ?? '';
 
         if ($externalId !== '') {
-            $storage = $this->entityTypeManager->getStorage('lead');
-            $existing = $storage->loadByProperties(['external_id' => $externalId]);
+            $existing = $this->entityTypeManager->getStorage('lead')->getQuery()
+                ->accessCheck(false)
+                ->condition('external_id', $externalId)
+                ->execute();
 
             if ($existing !== []) {
                 return null;
