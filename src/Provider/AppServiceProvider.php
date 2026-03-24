@@ -29,13 +29,42 @@ final class AppServiceProvider extends ServiceProvider
     private function controller(): MarketingController
     {
         if ($this->controller === null) {
+            $etm = $this->resolve(EntityTypeManager::class);
+            $leadManager = new LeadManager($etm);
+            $leadFactory = new LeadFactory($leadManager, $etm);
+
+            // Resolve default brand ID from config slug
+            $defaultBrandId = $this->resolveDefaultBrandId($etm);
+
             $this->controller = new MarketingController(
-                $this->resolve(EntityTypeManager::class),
+                $etm,
                 $this->config['discord']['webhook_url'] ?? '',
+                $leadFactory,
+                $defaultBrandId,
             );
         }
 
         return $this->controller;
+    }
+
+    private function resolveDefaultBrandId(EntityTypeManager $etm): ?int
+    {
+        $defaultSlug = $this->config['pipeline']['default_brand'] ?? 'northops';
+
+        try {
+            $query = $etm->getStorage('brand')->getQuery();
+            $query->condition('slug', $defaultSlug);
+            $brands = $query->execute();
+
+            if (!empty($brands)) {
+                $brand = reset($brands);
+                return (int) $brand->get('id');
+            }
+        } catch (\Throwable) {
+            // Brand table may not exist yet during initial setup
+        }
+
+        return null;
     }
 
     private function dashboardController(): DashboardController
