@@ -26,6 +26,7 @@ src/
 - **Routes** defined in `ServiceProvider::routes()` via `WaaseyaaRouter`
 - **Auth** via `Waaseyaa\Auth\AuthManager` (session-based)
 - **Config** via `config/waaseyaa.php` — use `getenv()` or `env()` helper, NEVER `$_ENV`
+- **Contact form** saves to `ContactSubmission` entity + sends Discord webhook notification (env: `DISCORD_WEBHOOK_URL`)
 
 ## Orchestration Table
 
