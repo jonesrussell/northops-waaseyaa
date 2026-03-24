@@ -80,6 +80,7 @@ php -S localhost:8080 -t public     # Dev server
 bin/waaseyaa                        # CLI
 bin/waaseyaa sync-rules             # Update framework rules from Waaseyaa
 bin/waaseyaa pipeline:seed-brands   # Seed NorthOps + Web Networks brands (idempotent)
+bin/waaseyaa pipeline:import-rfps   # Import RFPs from north-cloud (--days=7, --dry-run)
 ```
 
 ### Environment Variables
@@ -108,7 +109,7 @@ When modifying a subsystem, update its spec in the same PR.
 
 ## Known Gaps
 
-- **No test suite** — no PHPUnit tests yet for pipeline domain logic or API endpoints
+- **API endpoints are unauthenticated** — all `/api/leads` routes use `allowAll()`. Access policies exist but aren't wired to API routes. See #55.
 - **Phase 2 pending** — email sequences, PDF proposal generation (port LaTeX pipeline from web-networks-pipeline)
 - **Phase 3 pending** — external integrations (Calendly, LinkedIn, Mailchimp)
 - **Phase 4 pending** — analytics and revenue reporting
@@ -118,3 +119,6 @@ When modifying a subsystem, update its spec in the same PR.
 
 - **Never use `$_ENV`** — Waaseyaa's `EnvLoader` only populates `putenv()`/`getenv()`. Use `getenv()` or the `env()` helper.
 - **SQLite write access** — Both the `.sqlite` file AND its parent directory need write permissions for WAL/journal files.
+- **No `loadByProperties()` on SqlEntityStorage** — Use `getStorage('type')->getQuery()->condition('field', $value)->execute()` for property-based lookups.
+- **ServiceProvider method signatures must match parent exactly** — PHP enforces strict compatibility. Check `ServiceProvider::commands()` and `ServiceProvider::routes()` signatures when overriding.
+- **`dep deploy` broken for local use** — SSH user mismatch (deployer vs jones). Use `ssh jones@northops.ca "sudo -u deployer bash -c '...'"` for manual deploys. See #56.
