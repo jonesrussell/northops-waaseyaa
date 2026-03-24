@@ -15,6 +15,7 @@ use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Routing\WaaseyaaRouter;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Registers pipeline CLI commands and domain services.
@@ -28,6 +29,7 @@ final class PipelineServiceProvider extends ServiceProvider
     public function commands(
         EntityTypeManager $entityTypeManager,
         DatabaseInterface $database,
+        EventDispatcherInterface $dispatcher,
     ): array {
         $discordUrl = $this->config['discord']['webhook_url'] ?? '';
         $northcloudUrl = $this->config['pipeline']['northcloud_url'] ?? '';
