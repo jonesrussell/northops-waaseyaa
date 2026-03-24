@@ -11,9 +11,11 @@ use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
 use App\Domain\Pipeline\RfpImportService;
+use App\Support\DiscordNotifier;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
+use Waaseyaa\HttpClient\StreamHttpClient;
 use Waaseyaa\Routing\WaaseyaaRouter;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -31,14 +33,18 @@ final class PipelineServiceProvider extends ServiceProvider
         DatabaseInterface $database,
         EventDispatcherInterface $dispatcher,
     ): array {
-        $discordUrl = $this->config['discord']['webhook_url'] ?? '';
+        $httpClient = new StreamHttpClient();
+        $discordNotifier = new DiscordNotifier(
+            new StreamHttpClient(timeout: 5.0),
+            $this->config['discord']['webhook_url'] ?? '',
+        );
         $northcloudUrl = $this->config['pipeline']['northcloud_url'] ?? '';
 
-        $leadCreatedSubscriber = new LeadCreatedSubscriber($entityTypeManager, $discordUrl);
-        $stageChangedSubscriber = new StageChangedSubscriber($entityTypeManager, $discordUrl);
+        $leadCreatedSubscriber = new LeadCreatedSubscriber($entityTypeManager, $discordNotifier);
+        $stageChangedSubscriber = new StageChangedSubscriber($entityTypeManager, $discordNotifier);
         $leadManager = new LeadManager($entityTypeManager, $leadCreatedSubscriber, $stageChangedSubscriber);
         $leadFactory = new LeadFactory($leadManager, $entityTypeManager);
-        $rfpImportService = new RfpImportService($leadFactory, $northcloudUrl);
+        $rfpImportService = new RfpImportService($leadFactory, $httpClient, $northcloudUrl);
 
         $defaultBrandId = $this->resolveDefaultBrandId($entityTypeManager);
 

@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Domain\Qualification;
 
 use App\Entity\Lead;
+use Waaseyaa\HttpClient\HttpClientInterface;
+use Waaseyaa\HttpClient\HttpRequestException;
 
 final class QualificationService
 {
     public function __construct(
+        private readonly HttpClientInterface $httpClient,
         private readonly string $apiKey,
         private readonly CompanyProfile $companyProfile,
     ) {}
@@ -26,35 +29,26 @@ final class QualificationService
 
         $promptInput = $this->buildPrompt($lead);
 
-        $payload = json_encode([
-            'model' => 'claude-haiku-4-5',
-            'max_tokens' => 600,
-            'messages' => [
-                ['role' => 'user', 'content' => json_encode($promptInput, JSON_THROW_ON_ERROR)],
-            ],
-        ], JSON_THROW_ON_ERROR);
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => implode("\r\n", [
-                    'Content-Type: application/json',
-                    'x-api-key: ' . $this->apiKey,
-                    'anthropic-version: 2023-06-01',
-                ]),
-                'content' => $payload,
-                'timeout' => 30,
-                'ignore_errors' => true,
-            ],
-        ]);
-
-        $response = @file_get_contents('https://api.anthropic.com/v1/messages', false, $context);
-
-        if ($response === false) {
-            throw new \RuntimeException('Failed to connect to Anthropic API.');
+        try {
+            $response = $this->httpClient->post(
+                'https://api.anthropic.com/v1/messages',
+                [
+                    'x-api-key' => $this->apiKey,
+                    'anthropic-version' => '2023-06-01',
+                ],
+                [
+                    'model' => 'claude-haiku-4-5',
+                    'max_tokens' => 600,
+                    'messages' => [
+                        ['role' => 'user', 'content' => json_encode($promptInput, JSON_THROW_ON_ERROR)],
+                    ],
+                ],
+            );
+        } catch (HttpRequestException $e) {
+            throw new \RuntimeException('Failed to connect to Anthropic API.', 0, $e);
         }
 
-        return $this->parseResponse($response);
+        return $this->parseResponse($response->body);
     }
 
     /**

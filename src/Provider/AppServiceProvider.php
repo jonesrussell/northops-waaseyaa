@@ -15,9 +15,11 @@ use App\Domain\Pipeline\LeadManager;
 use App\Domain\Pipeline\RfpImportService;
 use App\Domain\Qualification\CompanyProfile;
 use App\Domain\Qualification\QualificationService;
+use App\Support\DiscordNotifier;
 use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
+use Waaseyaa\HttpClient\StreamHttpClient;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\SSR\SsrResponse;
@@ -34,10 +36,10 @@ final class AppServiceProvider extends ServiceProvider
     {
         if ($this->controller === null) {
             $etm = $this->resolve(EntityTypeManager::class);
-            $discordUrl = $this->config['discord']['webhook_url'] ?? '';
+            $discordNotifier = $this->buildDiscordNotifier();
 
-            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordUrl);
-            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordUrl);
+            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordNotifier);
+            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordNotifier);
             $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
             $leadFactory = new LeadFactory($leadManager, $etm);
 
@@ -45,13 +47,21 @@ final class AppServiceProvider extends ServiceProvider
 
             $this->controller = new MarketingController(
                 $etm,
-                $discordUrl,
+                $discordNotifier,
                 $leadFactory,
                 $defaultBrandId,
             );
         }
 
         return $this->controller;
+    }
+
+    private function buildDiscordNotifier(): DiscordNotifier
+    {
+        return new DiscordNotifier(
+            new StreamHttpClient(timeout: 5.0),
+            $this->config['discord']['webhook_url'] ?? '',
+        );
     }
 
     private function resolveDefaultBrandId(EntityTypeManager $etm): ?int
@@ -86,21 +96,24 @@ final class AppServiceProvider extends ServiceProvider
     {
         if ($this->apiController === null) {
             $etm = $this->resolve(EntityTypeManager::class);
-            $discordUrl = $this->config['discord']['webhook_url'] ?? '';
+            $httpClient = new StreamHttpClient();
+            $discordNotifier = $this->buildDiscordNotifier();
 
-            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordUrl);
-            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordUrl);
-            $leadQualifiedSubscriber = new LeadQualifiedSubscriber($etm, $discordUrl);
+            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordNotifier);
+            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordNotifier);
+            $leadQualifiedSubscriber = new LeadQualifiedSubscriber($etm, $discordNotifier);
             $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
             $leadFactory = new LeadFactory($leadManager, $etm);
 
             $qualificationService = new QualificationService(
+                $httpClient,
                 $this->config['pipeline']['anthropic_api_key'] ?? '',
                 new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
             );
 
             $rfpImportService = new RfpImportService(
                 $leadFactory,
+                $httpClient,
                 $this->config['pipeline']['northcloud_url'] ?? '',
             );
 

@@ -6,13 +6,14 @@ namespace App\Domain\Pipeline\EventSubscriber;
 
 use App\Entity\Lead;
 use App\Entity\LeadActivity;
+use App\Support\DiscordNotifier;
 use Waaseyaa\Entity\EntityTypeManager;
 
 final class LeadQualifiedSubscriber
 {
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
-        private readonly string $discordWebhookUrl,
+        private readonly DiscordNotifier $discordNotifier,
     ) {}
 
     /**
@@ -48,10 +49,6 @@ final class LeadQualifiedSubscriber
      */
     private function notifyDiscord(Lead $lead, array $qualificationResult): void
     {
-        if ($this->discordWebhookUrl === '') {
-            return;
-        }
-
         $rating = $qualificationResult['rating'];
         $color = match (true) {
             $rating >= 70 => 0x57F287,  // Green — strong lead
@@ -61,7 +58,7 @@ final class LeadQualifiedSubscriber
 
         $keywords = implode(', ', $qualificationResult['keywords']);
 
-        $embed = [
+        $this->discordNotifier->sendEmbed([
             'title' => 'Lead Qualified',
             'color' => $color,
             'fields' => [
@@ -73,20 +70,6 @@ final class LeadQualifiedSubscriber
                 ['name' => 'Summary', 'value' => mb_substr($qualificationResult['summary'] ?? '', 0, 1024) ?: '(none)', 'inline' => false],
             ],
             'timestamp' => date('c'),
-        ];
-
-        $payload = json_encode(['embeds' => [$embed]], JSON_THROW_ON_ERROR);
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n",
-                'content' => $payload,
-                'timeout' => 5,
-                'ignore_errors' => true,
-            ],
         ]);
-
-        @file_get_contents($this->discordWebhookUrl, false, $context);
     }
 }

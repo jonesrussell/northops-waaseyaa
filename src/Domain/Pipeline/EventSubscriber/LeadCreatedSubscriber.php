@@ -6,13 +6,14 @@ namespace App\Domain\Pipeline\EventSubscriber;
 
 use App\Entity\Lead;
 use App\Entity\LeadActivity;
+use App\Support\DiscordNotifier;
 use Waaseyaa\Entity\EntityTypeManager;
 
 final class LeadCreatedSubscriber
 {
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
-        private readonly string $discordWebhookUrl,
+        private readonly DiscordNotifier $discordNotifier,
     ) {}
 
     public function handle(Lead $lead): void
@@ -38,11 +39,7 @@ final class LeadCreatedSubscriber
 
     private function notifyDiscord(Lead $lead): void
     {
-        if ($this->discordWebhookUrl === '') {
-            return;
-        }
-
-        $embed = [
+        $this->discordNotifier->sendEmbed([
             'title' => 'New Lead Created',
             'color' => 0x57F287,
             'fields' => [
@@ -53,20 +50,6 @@ final class LeadCreatedSubscriber
                 ['name' => 'Email', 'value' => $lead->getContactEmail() ?: '(none)', 'inline' => true],
             ],
             'timestamp' => date('c'),
-        ];
-
-        $payload = json_encode(['embeds' => [$embed]], JSON_THROW_ON_ERROR);
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n",
-                'content' => $payload,
-                'timeout' => 5,
-                'ignore_errors' => true,
-            ],
         ]);
-
-        @file_get_contents($this->discordWebhookUrl, false, $context);
     }
 }

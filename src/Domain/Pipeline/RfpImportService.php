@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Domain\Pipeline;
 
 use App\Domain\Qualification\SectorNormalizer;
+use Waaseyaa\HttpClient\HttpClientInterface;
+use Waaseyaa\HttpClient\HttpRequestException;
 
 /**
  * Fetches RFPs from north-cloud's search API and imports them as leads.
@@ -15,6 +17,7 @@ final class RfpImportService
 {
     public function __construct(
         private readonly LeadFactory $leadFactory,
+        private readonly HttpClientInterface $httpClient,
         private readonly string $northcloudUrl,
     ) {}
 
@@ -78,45 +81,35 @@ final class RfpImportService
             return null;
         }
 
-        $requestBody = json_encode([
-            'query' => '',
-            'filters' => [
-                'content_type' => 'rfp',
-                'from_date' => $fromDate,
-            ],
-            'pagination' => [
-                'page' => $page,
-                'size' => 100,
-            ],
-            'sort' => [
-                'field' => 'published_date',
-                'order' => 'desc',
-            ],
-        ], JSON_THROW_ON_ERROR);
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\nAccept: application/json\r\n",
-                'content' => $requestBody,
-                'timeout' => 30,
-                'ignore_errors' => true,
-            ],
-        ]);
-
-        $response = @file_get_contents($this->northcloudUrl . '/api/v1/search', false, $context);
-
-        if ($response === false) {
+        try {
+            $response = $this->httpClient->post(
+                $this->northcloudUrl . '/api/v1/search',
+                ['Accept' => 'application/json'],
+                [
+                    'query' => '',
+                    'filters' => [
+                        'content_type' => 'rfp',
+                        'from_date' => $fromDate,
+                    ],
+                    'pagination' => [
+                        'page' => $page,
+                        'size' => 100,
+                    ],
+                    'sort' => [
+                        'field' => 'published_date',
+                        'order' => 'desc',
+                    ],
+                ],
+            );
+        } catch (HttpRequestException) {
             return null;
         }
 
-        // Check for non-2xx HTTP status.
-        $statusLine = $http_response_header[0] ?? '';
-        if (!preg_match('/\s2\d{2}\s/', $statusLine)) {
+        if (!$response->isSuccess()) {
             return null;
         }
 
-        $decoded = json_decode($response, true);
+        $decoded = json_decode($response->body, true);
 
         if (!is_array($decoded)) {
             return null;

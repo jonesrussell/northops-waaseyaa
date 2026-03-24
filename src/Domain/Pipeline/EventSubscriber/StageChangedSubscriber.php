@@ -6,13 +6,14 @@ namespace App\Domain\Pipeline\EventSubscriber;
 
 use App\Entity\Lead;
 use App\Entity\LeadActivity;
+use App\Support\DiscordNotifier;
 use Waaseyaa\Entity\EntityTypeManager;
 
 final class StageChangedSubscriber
 {
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
-        private readonly string $discordWebhookUrl,
+        private readonly DiscordNotifier $discordNotifier,
     ) {}
 
     public function handle(Lead $lead, string $fromStage, string $toStage, ?string $userId = null): void
@@ -38,10 +39,6 @@ final class StageChangedSubscriber
 
     private function notifyDiscord(Lead $lead, string $fromStage, string $toStage): void
     {
-        if ($this->discordWebhookUrl === '') {
-            return;
-        }
-
         $color = match ($toStage) {
             'won' => 0x57F287,       // Green
             'lost' => 0xED4245,      // Red
@@ -72,18 +69,6 @@ final class StageChangedSubscriber
             $embed['fields'][] = ['name' => 'Deal Value', 'value' => '$' . $lead->getValue(), 'inline' => true];
         }
 
-        $payload = json_encode(['embeds' => [$embed]], JSON_THROW_ON_ERROR);
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n",
-                'content' => $payload,
-                'timeout' => 5,
-                'ignore_errors' => true,
-            ],
-        ]);
-
-        @file_get_contents($this->discordWebhookUrl, false, $context);
+        $this->discordNotifier->sendEmbed($embed);
     }
 }
