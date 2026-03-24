@@ -17,7 +17,7 @@ set('writable_dirs', ['storage']);
 
 host('northops.ca')
     ->set('remote_user', 'deployer')
-    ->set('deploy_path', '~/northops-waaseyaa');
+    ->set('deploy_path', '~/northops');
 
 // Tasks
 
