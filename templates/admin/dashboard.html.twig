@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pipeline — NorthOps{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Pipeline</h1>
+        <div class="dashboard-actions">
+            <button class="btn btn-primary" id="add-lead-btn">+ New Lead</button>
+            <div class="dashboard-filters">
+                <select id="filter-brand"><option value="">All Brands</option></select>
+                <select id="filter-sector"><option value="">All Sectors</option></select>
+                <select id="filter-source"><option value="">All Sources</option></select>
+            </div>
+        </div>
+    </div>
+
+    <div class="pipeline-board" id="pipeline-board">
+        <!-- Columns populated by JS -->
+    </div>
+</div>
+
+<!-- New Lead Modal -->
+<div class="modal" id="new-lead-modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>New Lead</h2>
+            <button class="modal-close" id="modal-close">&times;</button>
+        </div>
+        <form id="new-lead-form">
+            <div class="form-group">
+                <label for="lead-label">Name / Title</label>
+                <input type="text" id="lead-label" name="label" required>
+            </div>
+            <div class="form-group">
+                <label for="lead-company">Company</label>
+                <input type="text" id="lead-company" name="company_name">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lead-contact-name">Contact Name</label>
+                    <input type="text" id="lead-contact-name" name="contact_name">
+                </div>
+                <div class="form-group">
+                    <label for="lead-contact-email">Contact Email</label>
+                    <input type="email" id="lead-contact-email" name="contact_email">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lead-brand">Brand</label>
+                    <select id="lead-brand" name="brand_id"></select>
+                </div>
+                <div class="form-group">
+                    <label for="lead-source">Source</label>
+                    <select id="lead-source" name="source"></select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lead-sector">Sector</label>
+                    <select id="lead-sector" name="sector"><option value="">—</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="lead-value">Deal Value ($)</label>
+                    <input type="number" id="lead-value" name="value" step="0.01">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn" id="modal-cancel">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Lead</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/css/dashboard.css">
+<script src="/js/dashboard.js"></script>
+{% endblock %}

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Provider;
 
 use App\Controller\Api\LeadController;
+use App\Controller\DashboardController;
 use App\Controller\MarketingController;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
@@ -21,6 +22,7 @@ final class AppServiceProvider extends ServiceProvider
 {
     private ?MarketingController $controller = null;
     private ?LeadController $apiController = null;
+    private ?DashboardController $dashboardController = null;
 
     public function register(): void {}
 
@@ -34,6 +36,15 @@ final class AppServiceProvider extends ServiceProvider
         }
 
         return $this->controller;
+    }
+
+    private function dashboardController(): DashboardController
+    {
+        if ($this->dashboardController === null) {
+            $this->dashboardController = new DashboardController();
+        }
+
+        return $this->dashboardController;
     }
 
     private function apiController(): LeadController
@@ -126,6 +137,46 @@ final class AppServiceProvider extends ServiceProvider
                 })
                 ->allowAll()
                 ->methods('GET', 'POST')
+                ->build(),
+        );
+
+        // ---------------------------------------------------------------
+        // Admin routes
+        // ---------------------------------------------------------------
+
+        $router->addRoute(
+            'admin.dashboard',
+            RouteBuilder::create('/admin')
+                ->controller(fn () => new SsrResponse($this->dashboardController()->index()))
+                ->allowAll()
+                ->methods('GET')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'admin.leads',
+            RouteBuilder::create('/admin/leads')
+                ->controller(fn () => new SsrResponse($this->dashboardController()->leadList()))
+                ->allowAll()
+                ->methods('GET')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'admin.lead.detail',
+            RouteBuilder::create('/admin/leads/{id}')
+                ->controller(fn (string $id) => new SsrResponse($this->dashboardController()->leadDetail($id)))
+                ->allowAll()
+                ->methods('GET')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'admin.settings',
+            RouteBuilder::create('/admin/settings')
+                ->controller(fn () => new SsrResponse($this->dashboardController()->settings()))
+                ->allowAll()
+                ->methods('GET')
                 ->build(),
         );
 

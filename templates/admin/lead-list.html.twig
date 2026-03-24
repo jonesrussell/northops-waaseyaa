@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Leads — NorthOps{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Leads</h1>
+        <div class="dashboard-actions">
+            <a href="/admin" class="btn">Board View</a>
+            <div class="dashboard-filters">
+                <select id="filter-brand"><option value="">All Brands</option></select>
+                <select id="filter-stage"><option value="">All Stages</option></select>
+                <select id="filter-sector"><option value="">All Sectors</option></select>
+                <select id="filter-source"><option value="">All Sources</option></select>
+                <input type="search" id="filter-search" placeholder="Search leads...">
+            </div>
+        </div>
+    </div>
+
+    <div class="lead-table-wrap">
+        <table class="lead-table" id="lead-table">
+            <thead>
+                <tr>
+                    <th class="sortable" data-sort="label">Name</th>
+                    <th class="sortable" data-sort="company_name">Company</th>
+                    <th class="sortable" data-sort="stage">Stage</th>
+                    <th class="sortable" data-sort="brand_id">Brand</th>
+                    <th class="sortable" data-sort="source">Source</th>
+                    <th class="sortable" data-sort="qualify_rating">Score</th>
+                    <th class="sortable" data-sort="value">Value</th>
+                    <th class="sortable" data-sort="closing_date">Closing</th>
+                    <th class="sortable" data-sort="updated_at">Updated</th>
+                </tr>
+            </thead>
+            <tbody id="lead-table-body">
+                <!-- Populated by JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/css/dashboard.css">
+<script src="/js/dashboard.js"></script>
+{% endblock %}
