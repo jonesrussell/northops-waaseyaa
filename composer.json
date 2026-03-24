@@ -71,7 +71,8 @@
     "extra": {
         "waaseyaa": {
             "providers": [
-                "App\\Provider\\AppServiceProvider"
+                "App\\Provider\\AppServiceProvider",
+                "App\\Provider\\PipelineServiceProvider"
             ]
         }
     },
