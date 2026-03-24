@@ -121,4 +121,4 @@ When modifying a subsystem, update its spec in the same PR.
 - **SQLite write access** — Both the `.sqlite` file AND its parent directory need write permissions for WAL/journal files.
 - **No `loadByProperties()` on SqlEntityStorage** — Use `getStorage('type')->getQuery()->condition('field', $value)->execute()` for property-based lookups.
 - **ServiceProvider method signatures must match parent exactly** — PHP enforces strict compatibility. Check `ServiceProvider::commands()` and `ServiceProvider::routes()` signatures when overriding.
-- **`dep deploy` broken for local use** — SSH user mismatch (deployer vs jones). Use `ssh jones@northops.ca "sudo -u deployer bash -c '...'"` for manual deploys. See #56.
+- **Always use `vendor/bin/dep deploy`** — never `git pull` on the server directly, as it skips `composer install` and symlink rotation. Run `composer install` locally first if `vendor/bin/dep` is missing.
