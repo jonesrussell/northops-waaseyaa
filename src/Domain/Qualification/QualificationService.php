@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Qualification;
 
+use App\Domain\Pipeline\ProspectScoringService;
 use App\Entity\Lead;
 use Waaseyaa\HttpClient\HttpClientInterface;
 use Waaseyaa\HttpClient\HttpRequestException;
@@ -14,12 +15,13 @@ final class QualificationService
         private readonly HttpClientInterface $httpClient,
         private readonly string $apiKey,
         private readonly CompanyProfile $companyProfile,
+        private readonly ProspectScoringService $scoringService,
     ) {}
 
     /**
-     * Qualify a lead using the Anthropic API.
+     * Qualify a lead using the Anthropic API, then score it for brand routing.
      *
-     * @return array{rating: int, keywords: string[], sector: ?string, summary: ?string, confidence: float, raw: string}
+     * @return array{rating: int, keywords: string[], sector: ?string, summary: ?string, confidence: float, raw: string, score: int, recommended_brand: string}
      */
     public function qualify(Lead $lead): array
     {
@@ -48,7 +50,31 @@ final class QualificationService
             throw new \RuntimeException('Failed to connect to Anthropic API.', 0, $e);
         }
 
-        return $this->parseResponse($response->body);
+        $qualification = $this->parseResponse($response->body);
+
+        $scoreResult = $this->scoringService->score([
+            'title' => $lead->getLabel(),
+            'description' => $lead->getDraftPdfMarkdown() !== '' ? $lead->getDraftPdfMarkdown() : $lead->getQualifyNotes(),
+            'qualify_rating' => $qualification['rating'],
+            'value' => (float) ($lead->get('value') ?? 0),
+            'closing_date' => $lead->get('closing_date'),
+            'sector' => $qualification['sector'] ?? $lead->getSector(),
+            'signal_type' => $lead->get('signal_type'),
+            'allowed_sectors' => $this->getAllowedSectors(),
+        ]);
+
+        return array_merge($qualification, [
+            'score' => $scoreResult['score'],
+            'recommended_brand' => $scoreResult['recommended_brand'],
+        ]);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getAllowedSectors(): array
+    {
+        return ['IT', 'Networks', 'Security', 'Cloud', 'Telecom', 'Software', 'Infrastructure'];
     }
 
     /**

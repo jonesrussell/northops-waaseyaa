@@ -231,6 +231,8 @@ final class LeadController
             'qualify_notes' => $qualification['summary'] ?? '',
             'qualify_raw' => $qualification['raw'],
             'sector' => $qualification['sector'] ?? $lead->getSector(),
+            'score' => $qualification['score'],
+            'recommended_brand' => $qualification['recommended_brand'],
         ]);
 
         $this->leadQualifiedSubscriber?->handle($lead, $qualification);
