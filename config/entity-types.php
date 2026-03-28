@@ -50,4 +50,10 @@ return [
         class: \App\Entity\LeadAttachment::class,
         keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'filename'],
     ),
+    new \Waaseyaa\Entity\EntityType(
+        id: 'outreach',
+        label: 'Outreach',
+        class: \App\Entity\Outreach::class,
+        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'subject'],
+    ),
 ];
