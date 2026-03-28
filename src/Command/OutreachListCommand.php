@@ -53,7 +53,7 @@ final class OutreachListCommand extends Command
         $previewUuid = $input->getOption('preview');
 
         if ($previewUuid !== null) {
-            return $this->previewEmail((string) $previewUuid, $input, $output);
+            return $this->previewEmail((string) $previewUuid, $output);
         }
 
         return $this->listLeads($input, $output);
@@ -145,7 +145,7 @@ final class OutreachListCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function previewEmail(string $leadUuid, InputInterface $input, OutputInterface $output): int
+    private function previewEmail(string $leadUuid, OutputInterface $output): int
     {
         $leadStorage = $this->entityTypeManager->getStorage('lead');
 
