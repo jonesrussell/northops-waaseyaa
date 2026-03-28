@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --no-check-publish --no-check-all
+
+      - name: Check PHP syntax
+        run: find src -name '*.php' -print0 | xargs -0 -n1 php -l
+
+  test:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, sqlite3, mbstring, xml
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run tests
+        run: ./vendor/bin/phpunit
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run composer audit
+        run: composer audit --format=plain
+
+      - name: Check for secrets in tracked files
+        run: |
+          fail=0
+          if git grep -lE '(ANTHROPIC_API_KEY|DISCORD_WEBHOOK_URL|PIPELINE_API_KEY|DB_PASSWORD|APP_SECRET)\s*=' -- ':!.env.example' ':!*.md' ':!*.json' 2>/dev/null; then
+            echo "FAIL: Possible secrets found in tracked files"
+            fail=1
+          fi
+          if git ls-files --error-unmatch .env 2>/dev/null; then
+            echo "FAIL: .env file is tracked in git"
+            fail=1
+          fi
+          exit $fail
