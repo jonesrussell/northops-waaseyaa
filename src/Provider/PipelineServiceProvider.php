@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace App\Provider;
 
 use App\Command\ImportRfpsCommand;
+use App\Command\OutreachListCommand;
+use App\Command\ScoreLeadsCommand;
 use App\Command\SeedBrandsCommand;
 use App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
+use App\Domain\Pipeline\OutreachTemplateRenderer;
+use App\Domain\Pipeline\ProspectScoringService;
 use App\Domain\Pipeline\RfpImportService;
 use App\Support\DiscordNotifier;
 use Waaseyaa\Database\DatabaseInterface;
@@ -48,9 +52,14 @@ final class PipelineServiceProvider extends ServiceProvider
 
         $defaultBrandId = $this->resolveDefaultBrandId($entityTypeManager);
 
+        $scoringService = new ProspectScoringService();
+        $outreachRenderer = new OutreachTemplateRenderer();
+
         return [
             new SeedBrandsCommand($entityTypeManager),
             new ImportRfpsCommand($rfpImportService, $defaultBrandId),
+            new ScoreLeadsCommand($entityTypeManager, $scoringService),
+            new OutreachListCommand($entityTypeManager, $outreachRenderer),
         ];
     }
 

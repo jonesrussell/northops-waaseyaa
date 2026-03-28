@@ -8,4 +8,3 @@
 .env
 .worktrees/
 .phpunit.result.cache
-.worktrees/

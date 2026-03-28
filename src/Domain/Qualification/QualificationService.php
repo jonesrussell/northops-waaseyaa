@@ -15,6 +15,7 @@ final class QualificationService
         private readonly HttpClientInterface $httpClient,
         private readonly string $apiKey,
         private readonly CompanyProfile $companyProfile,
+        private readonly ProspectScoringService $scoringService,
     ) {}
 
     /**
@@ -51,8 +52,7 @@ final class QualificationService
 
         $qualification = $this->parseResponse($response->body);
 
-        $scoringService = new ProspectScoringService();
-        $scoreResult = $scoringService->score([
+        $scoreResult = $this->scoringService->score([
             'title' => $lead->getLabel(),
             'description' => $lead->getDraftPdfMarkdown() !== '' ? $lead->getDraftPdfMarkdown() : $lead->getQualifyNotes(),
             'qualify_rating' => $qualification['rating'],
