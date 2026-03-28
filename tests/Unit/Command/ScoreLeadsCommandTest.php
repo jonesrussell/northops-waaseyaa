@@ -46,6 +46,8 @@ final class ScoreLeadsCommandTest extends TestCase
 
             public function load(int|string $id): ?EntityInterface { return $this->leads[$id] ?? null; }
 
+            public function loadByKey(string $key, mixed $value): ?EntityInterface { return null; }
+
             public function loadMultiple(array $ids = []): array
             {
                 return array_filter($this->leads, fn ($lead, $id) => in_array($id, $ids, true), ARRAY_FILTER_USE_BOTH);
