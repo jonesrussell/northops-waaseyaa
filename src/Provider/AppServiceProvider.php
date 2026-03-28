@@ -109,6 +109,7 @@ final class AppServiceProvider extends ServiceProvider
                 $httpClient,
                 $this->config['pipeline']['anthropic_api_key'] ?? '',
                 new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
+                new \App\Domain\Pipeline\ProspectScoringService(),
             );
 
             $rfpImportService = new RfpImportService(
