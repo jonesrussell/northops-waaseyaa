@@ -13,7 +13,8 @@ set('writable_dirs', ['storage']);
 
 // Hosts
 
-host('northops.ca')
+host('production')
+    ->set('hostname', 'northops.ca')
     ->set('remote_user', 'deployer')
     ->set('deploy_path', '~/northops');
 
