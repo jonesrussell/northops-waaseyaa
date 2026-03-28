@@ -4605,7 +4605,7 @@
         },
         {
             "name": "waaseyaa/cache",
-            "version": "v0.1.0-alpha.68",
+            "version": "v0.1.0-alpha.69",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/cache.git",
@@ -4648,7 +4648,7 @@
             "description": "Cache bins with cache tag invalidation for Waaseyaa",
             "support": {
                 "issues": "https://github.com/waaseyaa/cache/issues",
-                "source": "https://github.com/waaseyaa/cache/tree/v0.1.0-alpha.68"
+                "source": "https://github.com/waaseyaa/cache/tree/v0.1.0-alpha.69"
             },
             "time": "2026-03-23T00:58:08+00:00"
         },
@@ -5778,7 +5778,7 @@
         },
         {
             "name": "waaseyaa/plugin",
-            "version": "v0.1.0-alpha.68",
+            "version": "v0.1.0-alpha.69",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/plugin.git",
@@ -5816,7 +5816,7 @@
             "description": "Attribute-based plugin discovery and management for Waaseyaa",
             "support": {
                 "issues": "https://github.com/waaseyaa/plugin/issues",
-                "source": "https://github.com/waaseyaa/plugin/tree/v0.1.0-alpha.68"
+                "source": "https://github.com/waaseyaa/plugin/tree/v0.1.0-alpha.69"
             },
             "time": "2026-03-16T21:50:01+00:00"
         },
