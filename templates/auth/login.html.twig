@@ -9,6 +9,7 @@
         <p class="auth-subtitle">Access the NorthOps dashboard</p>
 
         <form method="POST" action="/login">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             {% if redirect is defined and redirect %}
                 <input type="hidden" name="redirect" value="{{ redirect }}">
             {% endif %}
