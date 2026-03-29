@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f4ca2f69afcee7c2b1d1193319fbe8e",
+    "content-hash": "77554fa764ddf5d2037ca43e4e6f570e",
     "packages": [
         {
             "name": "deployer/deployer",
@@ -4216,7 +4216,7 @@
         },
         {
             "name": "waaseyaa/admin-surface",
-            "version": "v0.1.0-alpha.71",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/admin-surface.git",
@@ -4239,6 +4239,7 @@
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "waaseyaa": {
