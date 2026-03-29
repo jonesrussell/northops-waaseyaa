@@ -20,6 +20,14 @@ final class StageTransitionRules
         'lost' => [],
     ];
 
+    /**
+     * @return array<string, string[]>
+     */
+    public static function getTransitions(): array
+    {
+        return self::TRANSITIONS;
+    }
+
     public static function canTransition(string $from, string $to): bool
     {
         return in_array($to, self::TRANSITIONS[$from] ?? [], true);

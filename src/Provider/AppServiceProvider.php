@@ -15,8 +15,14 @@ use App\Domain\Pipeline\LeadManager;
 use App\Domain\Pipeline\RfpImportService;
 use App\Domain\Qualification\CompanyProfile;
 use App\Domain\Qualification\QualificationService;
+use App\Surface\Action\LeadBoardConfigAction;
+use App\Surface\Action\LeadQualifyAction;
+use App\Surface\Action\LeadTransitionStageAction;
+use App\Surface\LeadSurfaceHost;
 use App\Support\DiscordNotifier;
 use Symfony\Component\HttpFoundation\Request;
+use Waaseyaa\AdminSurface\AdminSurfaceServiceProvider;
+use Waaseyaa\Api\Schema\SchemaPresenter;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\HttpClient\StreamHttpClient;
@@ -29,6 +35,7 @@ final class AppServiceProvider extends ServiceProvider
     private ?MarketingController $controller = null;
     private ?LeadController $apiController = null;
     private ?DashboardController $dashboardController = null;
+    private ?LeadSurfaceHost $surfaceHost = null;
 
     public function register(): void {}
 
@@ -130,6 +137,31 @@ final class AppServiceProvider extends ServiceProvider
         }
 
         return $this->apiController;
+    }
+
+    private function surfaceHost(): LeadSurfaceHost
+    {
+        if ($this->surfaceHost === null) {
+            $etm = $this->resolve(EntityTypeManager::class);
+            $httpClient = new StreamHttpClient();
+
+            $qualificationService = new QualificationService(
+                $httpClient,
+                $this->config['pipeline']['anthropic_api_key'] ?? '',
+                new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
+                new \App\Domain\Pipeline\ProspectScoringService(),
+            );
+
+            $this->surfaceHost = new LeadSurfaceHost(
+                entityTypeManager: $etm,
+                boardConfigAction: new LeadBoardConfigAction(),
+                transitionAction: new LeadTransitionStageAction($etm),
+                qualifyAction: new LeadQualifyAction($etm, $qualificationService),
+                schemaPresenter: new SchemaPresenter(),
+            );
+        }
+
+        return $this->surfaceHost;
     }
 
     public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
@@ -362,5 +394,11 @@ final class AppServiceProvider extends ServiceProvider
                 ->methods('GET')
                 ->build(),
         );
+
+        // ---------------------------------------------------------------
+        // Admin surface routes (custom LeadSurfaceHost)
+        // ---------------------------------------------------------------
+
+        AdminSurfaceServiceProvider::registerRoutes($router, $this->surfaceHost());
     }
 }
