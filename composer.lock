@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77554fa764ddf5d2037ca43e4e6f570e",
+    "content-hash": "2e3660757174851090ce4ce00a45d143",
     "packages": [
         {
             "name": "deployer/deployer",
@@ -4216,16 +4216,16 @@
         },
         {
             "name": "waaseyaa/admin-surface",
-            "version": "dev-main",
+            "version": "v0.1.0-alpha.73",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/admin-surface.git",
-                "reference": "e148ca56f79529df149418c472f55469b547677a"
+                "reference": "bc82d374b831c661eea11674bb265ed875ecb3bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waaseyaa/admin-surface/zipball/e148ca56f79529df149418c472f55469b547677a",
-                "reference": "e148ca56f79529df149418c472f55469b547677a",
+                "url": "https://api.github.com/repos/waaseyaa/admin-surface/zipball/bc82d374b831c661eea11674bb265ed875ecb3bf",
+                "reference": "bc82d374b831c661eea11674bb265ed875ecb3bf",
                 "shasum": ""
             },
             "require": {
@@ -4239,7 +4239,6 @@
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "waaseyaa": {
@@ -4264,9 +4263,9 @@
             "description": "Canonical integration boundary for the Waaseyaa Admin SPA",
             "support": {
                 "issues": "https://github.com/waaseyaa/admin-surface/issues",
-                "source": "https://github.com/waaseyaa/admin-surface/tree/v0.1.0-alpha.71"
+                "source": "https://github.com/waaseyaa/admin-surface/tree/v0.1.0-alpha.73"
             },
-            "time": "2026-03-29T12:13:49+00:00"
+            "time": "2026-03-29T13:26:41+00:00"
         },
         {
             "name": "waaseyaa/ai-agent",
