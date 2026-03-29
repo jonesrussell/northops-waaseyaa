@@ -53,7 +53,7 @@ final class AuthController
 
         $storage = $this->entityTypeManager->getStorage('user');
         $ids = $storage->getQuery()
-            ->condition('mail', $email)
+            ->condition('email', $email)
             ->execute();
 
         if ($ids === []) {
