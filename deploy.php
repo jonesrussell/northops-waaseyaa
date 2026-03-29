@@ -7,7 +7,7 @@ require 'recipe/common.php';
 // Config
 
 set('keep_releases', 5);
-set('shared_files', ['.env', 'waaseyaa.sqlite']);
+set('shared_files', ['.env']);
 set('shared_dirs', ['storage']);
 set('writable_dirs', ['storage']);
 
