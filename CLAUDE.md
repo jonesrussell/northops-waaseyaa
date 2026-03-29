@@ -93,6 +93,14 @@ bin/waaseyaa pipeline:import-rfps   # Import RFPs from north-cloud (--days=7, --
 | `PIPELINE_API_KEY` | API key for machine-to-machine endpoints | For import endpoint |
 | `COMPANY_PROFILE` | Company description for AI qualification prompts | No (has default) |
 
+## Deploy Architecture
+
+The deploy workflow has **two code paths** for waaseyaa code:
+- **Admin SPA**: Built from `waaseyaa/framework` `ref: main` (always latest)
+- **PHP packages**: Installed from Packagist via `composer.lock` (pinned versions)
+
+To deploy a PHP framework fix: tag waaseyaa → wait for Packagist index → `composer clear-cache && composer update 'waaseyaa/*'` → commit lock → push.
+
 ## Codified Context
 
 This app uses a three-tier codified context system inherited from Waaseyaa:
