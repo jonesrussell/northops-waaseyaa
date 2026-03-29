@@ -4843,7 +4843,7 @@
         },
         {
             "name": "waaseyaa/database-legacy",
-            "version": "v0.1.0-alpha.70",
+            "version": "v0.1.0-alpha.71",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/database-legacy.git",
@@ -4881,7 +4881,7 @@
             "description": "Database adapter wrapping Drupal DBAL. Interim until Doctrine migration.",
             "support": {
                 "issues": "https://github.com/waaseyaa/database-legacy/issues",
-                "source": "https://github.com/waaseyaa/database-legacy/tree/v0.1.0-alpha.70"
+                "source": "https://github.com/waaseyaa/database-legacy/tree/v0.1.0-alpha.71"
             },
             "time": "2026-03-19T22:48:53+00:00"
         },
