@@ -73,6 +73,7 @@
         "waaseyaa": {
             "providers": [
                 "App\\Provider\\AppServiceProvider",
+                "App\\Provider\\AuthServiceProvider",
                 "App\\Provider\\PipelineServiceProvider"
             ]
         }
