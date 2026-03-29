@@ -6256,7 +6256,7 @@
         },
         {
             "name": "waaseyaa/typed-data",
-            "version": "v0.1.0-alpha.70",
+            "version": "v0.1.0-alpha.71",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/typed-data.git",
@@ -6294,7 +6294,7 @@
             "description": "Type system with PHP-native facade for Waaseyaa",
             "support": {
                 "issues": "https://github.com/waaseyaa/typed-data/issues",
-                "source": "https://github.com/waaseyaa/typed-data/tree/v0.1.0-alpha.70"
+                "source": "https://github.com/waaseyaa/typed-data/tree/v0.1.0-alpha.71"
             },
             "time": "2026-03-16T21:50:01+00:00"
         },
