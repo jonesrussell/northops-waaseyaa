@@ -28,6 +28,11 @@ task('deploy:clear_manifest', function (): void {
     run('rm -f {{deploy_path}}/shared/storage/framework/packages.php || true');
 });
 
+task('deploy:fix_permissions', function (): void {
+    run('chmod 666 {{deploy_path}}/shared/storage/waaseyaa.sqlite || true');
+    run('chmod 775 {{deploy_path}}/shared/storage/ || true');
+});
+
 task('deploy:reload_php_fpm', function (): void {
     run('sudo systemctl reload php8.4-fpm || true');
 });
@@ -58,6 +63,7 @@ task('deploy', [
     'deploy:writable',
     'deploy:migrate',
     'deploy:symlink',
+    'deploy:fix_permissions',
     'deploy:clear_manifest',
     'deploy:reload_php_fpm',
     'deploy:health_check',
