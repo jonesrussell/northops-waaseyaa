@@ -6023,7 +6023,7 @@
         },
         {
             "name": "waaseyaa/ssr",
-            "version": "v0.1.0-alpha.89",
+            "version": "v0.1.0-alpha.90",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/ssr.git",
@@ -6073,7 +6073,7 @@
             "description": "Server-side rendering with Twig templates for Waaseyaa",
             "support": {
                 "issues": "https://github.com/waaseyaa/ssr/issues",
-                "source": "https://github.com/waaseyaa/ssr/tree/v0.1.0-alpha.89"
+                "source": "https://github.com/waaseyaa/ssr/tree/v0.1.0-alpha.90"
             },
             "time": "2026-03-29T15:19:43+00:00"
         },
