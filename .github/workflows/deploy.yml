@@ -94,7 +94,7 @@ jobs:
             --exclude='.git' \
             --exclude='.build/' \
             --exclude='tests/' \
-            --exclude='docs/' \
+            --exclude='/docs/' \
             --exclude='worktrees/' \
             --exclude='*.sqlite' \
             --exclude='.env' \
