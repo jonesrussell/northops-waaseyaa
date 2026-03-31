@@ -7,6 +7,7 @@ namespace App\Provider;
 use App\Controller\Api\LeadController;
 use App\Controller\DashboardController;
 use App\Controller\MarketingController;
+use App\Domain\Pipeline\ContactFormValidator;
 use App\Domain\Pipeline\Event\ContactSubmittedEvent;
 use App\Domain\Pipeline\EventSubscriber\ContactSubmittedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber;
@@ -146,6 +147,7 @@ final class AppServiceProvider extends ServiceProvider
                 $twig,
                 $etm,
                 $dispatcher,
+                new ContactFormValidator(),
                 $this->getLeadFactory(),
                 $defaultBrandId,
             );

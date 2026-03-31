@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Domain\Pipeline\ContactFormValidator;
 use App\Domain\Pipeline\Event\ContactSubmittedEvent;
 use App\Domain\Pipeline\LeadFactory;
 use App\Entity\ContactSubmission;
@@ -20,6 +21,7 @@ final class MarketingController
         private readonly Twig $twig,
         private readonly EntityTypeManager $entityTypeManager,
         private readonly EventDispatcherInterface $dispatcher,
+        private readonly ContactFormValidator $contactValidator,
         private readonly ?LeadFactory $leadFactory = null,
         private readonly ?int $defaultBrandId = null,
     ) {}
@@ -64,19 +66,7 @@ final class MarketingController
         $email = trim((string) $request->request->get('email', ''));
         $message = trim((string) $request->request->get('message', ''));
 
-        $errors = [];
-
-        if ($name === '' || strlen($name) > 255) {
-            $errors['name'] = 'Name is required (max 255 characters).';
-        }
-
-        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 255) {
-            $errors['email'] = 'A valid email address is required.';
-        }
-
-        if ($message === '' || strlen($message) > 5000) {
-            $errors['message'] = 'Message is required (max 5000 characters).';
-        }
+        $errors = $this->contactValidator->validate($name, $email, $message);
 
         if ($errors !== []) {
             return $this->twig->render('contact.html.twig', [
