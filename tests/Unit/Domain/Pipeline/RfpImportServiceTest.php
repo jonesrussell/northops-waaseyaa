@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Domain\Pipeline;
 
 use App\Domain\Pipeline\RfpImportService;
-use App\Domain\Pipeline\LeadFactory;
-use App\Domain\Pipeline\LeadManager;
 use PHPUnit\Framework\TestCase;
-use Waaseyaa\Entity\EntityTypeManager;
 
 final class RfpImportServiceTest extends TestCase
 {
@@ -28,5 +25,29 @@ final class RfpImportServiceTest extends TestCase
         $this->assertSame(1, $stats['errors']);
         $this->assertSame(0, $stats['imported']);
         $this->assertSame(0, $stats['skipped']);
+    }
+
+    public function testMapHitToRfpDataFallsBackToSourceUrl(): void
+    {
+        $ref = new \ReflectionClass(RfpImportService::class);
+        $service = $ref->newInstanceWithoutConstructor();
+
+        $method = $ref->getMethod('mapHitToRfpData');
+
+        // canonical_url present
+        $result = $method->invoke($service, ['canonical_url' => 'https://example.com/rfp/1']);
+        $this->assertSame('https://example.com/rfp/1', $result['source_url']);
+
+        // canonical_url absent, source present
+        $result = $method->invoke($service, ['source' => 'https://canadabuys.ca/rfp/2']);
+        $this->assertSame('https://canadabuys.ca/rfp/2', $result['source_url']);
+
+        // both absent, url present
+        $result = $method->invoke($service, ['url' => 'https://fallback.ca/3']);
+        $this->assertSame('https://fallback.ca/3', $result['source_url']);
+
+        // all absent
+        $result = $method->invoke($service, []);
+        $this->assertSame('', $result['source_url']);
     }
 }
