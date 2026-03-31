@@ -613,7 +613,7 @@
             var progressBar = el('div', { className: 'progress-bar-track' }, [
                 el('div', {
                     className: 'progress-bar-fill',
-                    style: 'width:' + lead.routing_confidence + '%',
+                    style: 'width:' + Math.min(100, Math.max(0, lead.routing_confidence)) + '%',
                 }),
             ]);
             grid.appendChild(el('div', { className: 'routing-scoring-field' }, [
