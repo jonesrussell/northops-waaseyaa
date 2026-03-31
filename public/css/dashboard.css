@@ -858,6 +858,16 @@
     white-space: nowrap;
 }
 
+.org-type-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    background: var(--dash-border);
+    color: var(--dash-text-muted);
+    white-space: nowrap;
+}
+
 .tier-T1 {
     background: #dc262620;
     color: #dc2626;
