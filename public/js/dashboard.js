@@ -241,21 +241,28 @@
         var scoreClass = score >= 70 ? 'score-high' : score >= 40 ? 'score-mid' : 'score-low';
         var urgency = getUrgency(lead.closing_date);
 
-        // Card header
+        // Card header: label + tier badge (or score badge if no tier)
         var headerChildren = [el('span', { className: 'card-label', textContent: lead.label || '' })];
-        if (score != null) {
+        if (lead.tier) {
+            headerChildren.push(el('span', {
+                className: 'tier-badge tier-' + lead.tier,
+                textContent: lead.tier,
+            }));
+        } else if (score != null) {
             headerChildren.push(el('span', { className: 'score-badge ' + scoreClass, textContent: String(score) }));
         }
         var cardHeader = el('div', { className: 'card-header' }, headerChildren);
 
-        // Card body parts
         var parts = [cardHeader];
 
         if (lead.company_name) {
             parts.push(el('div', { className: 'card-company', textContent: lead.company_name }));
         }
 
-        // Meta row
+        if (lead.organization_type) {
+            parts.push(el('span', { className: 'org-type-tag', textContent: lead.organization_type }));
+        }
+
         var metaChildren = [];
         if (brand) {
             metaChildren.push(el('span', {
@@ -264,8 +271,13 @@
                 textContent: brand.name,
             }));
         }
-        if (lead.source) {
+        if (lead.lead_source) {
+            metaChildren.push(el('span', { className: 'lead-source-tag', textContent: lead.lead_source }));
+        } else if (lead.source) {
             metaChildren.push(el('span', { className: 'source-tag', textContent: lead.source }));
+        }
+        if (lead.routing_confidence != null) {
+            metaChildren.push(el('span', { className: 'routing-confidence', textContent: lead.routing_confidence + '%' }));
         }
         if (urgency) {
             metaChildren.push(el('span', { className: 'urgency-badge urgency-' + urgency.level, textContent: urgency.label }));
@@ -316,7 +328,7 @@
 
         if (filtered.length === 0) {
             var emptyRow = el('tr', {}, [el('td', { className: 'empty-state' }, ['No leads found'])]);
-            emptyRow.querySelector('td').setAttribute('colspan', '9');
+            emptyRow.querySelector('td').setAttribute('colspan', '13');
             tbody.appendChild(emptyRow);
             return;
         }
@@ -353,6 +365,28 @@
                 scoreCell.appendChild(el('span', { className: 'score-badge ' + scoreClass, textContent: String(score) }));
             }
             cells.push(scoreCell);
+            // Tier
+            var tierCell = el('td');
+            if (l.tier) {
+                tierCell.appendChild(el('span', { className: 'tier-badge tier-' + l.tier, textContent: l.tier }));
+            }
+            cells.push(tierCell);
+            // Routing
+            var routingCell = el('td');
+            if (l.routing_confidence != null) {
+                var routingText = l.routing_confidence + '%';
+                if (brand) routingText += ' · ' + brand.name;
+                routingCell.appendChild(el('span', { className: 'routing-confidence', textContent: routingText }));
+            }
+            cells.push(routingCell);
+            // Org Type
+            cells.push(el('td', { textContent: l.organization_type || '' }));
+            // Lead Source
+            var sourceCell2 = el('td');
+            if (l.lead_source) {
+                sourceCell2.appendChild(el('span', { className: 'lead-source-tag', textContent: l.lead_source }));
+            }
+            cells.push(sourceCell2);
             // Value
             cells.push(el('td', { textContent: l.value ? '$' + Number(l.value).toLocaleString() : '' }));
             // Closing

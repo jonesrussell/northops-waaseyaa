@@ -844,3 +844,64 @@
         transform: translateY(0);
     }
 }
+
+/* Tier badges
+   ========================================================================== */
+
+.tier-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.tier-T1 {
+    background: #dc262620;
+    color: #dc2626;
+}
+
+.tier-T2 {
+    background: #d9770620;
+    color: #d97706;
+}
+
+.tier-T3 {
+    background: #6b728020;
+    color: #6b7280;
+}
+
+.tier-T4 {
+    background: #6b728015;
+    color: #9ca3af;
+}
+
+.tier-T5 {
+    background: #6b728010;
+    color: #d1d5db;
+}
+
+.routing-confidence {
+    font-size: 0.7rem;
+    color: var(--dash-text-muted);
+    white-space: nowrap;
+}
+
+.org-type-tag {
+    font-size: 0.7rem;
+    color: var(--dash-text-muted);
+    background: var(--dash-bg);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+}
+
+.lead-source-tag {
+    font-size: 0.7rem;
+    color: var(--dash-text-muted);
+    background: var(--dash-bg);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    text-transform: lowercase;
+}
