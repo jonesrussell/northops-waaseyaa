@@ -41,6 +41,14 @@
                 <div class="qual-reasoning" id="qual-reasoning"></div>
             </div>
 
+            <!-- Routing & Scoring -->
+            <div class="routing-scoring-section" id="routing-scoring-section" style="display:none;">
+                <h3>Routing &amp; Scoring</h3>
+                <div class="routing-scoring-grid" id="routing-scoring-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
             <!-- Editable fields -->
             <form id="lead-edit-form" class="detail-form">
                 <div class="form-row">
@@ -96,6 +104,80 @@
                 <div class="form-group">
                     <label for="edit-description">Description</label>
                     <textarea id="edit-description" name="description" rows="4"></textarea>
+                </div>
+                <h4 style="margin:1.5rem 0 0.75rem;font-size:0.85rem;color:var(--dash-text-muted);text-transform:uppercase;letter-spacing:0.03em;">Routing &amp; Scoring Overrides</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-tier">Tier</label>
+                        <select id="edit-tier" name="tier">
+                            <option value="">—</option>
+                            <option value="T1">T1 — Hot</option>
+                            <option value="T2">T2 — Warm</option>
+                            <option value="T3">T3 — Cold</option>
+                            <option value="T4">T4</option>
+                            <option value="T5">T5</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-organization-type">Organization Type</label>
+                        <select id="edit-organization-type" name="organization_type">
+                            <option value="">—</option>
+                            <option value="startup">Startup</option>
+                            <option value="nonprofit">Nonprofit</option>
+                            <option value="charity">Charity</option>
+                            <option value="indigenous">Indigenous</option>
+                            <option value="community">Community</option>
+                            <option value="government">Government</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-lead-source">Lead Source</label>
+                        <select id="edit-lead-source" name="lead_source">
+                            <option value="">—</option>
+                            <option value="rfp">RFP</option>
+                            <option value="signal">Signal</option>
+                            <option value="job_posting">Job Posting</option>
+                            <option value="funding">Funding</option>
+                            <option value="website_audit">Website Audit</option>
+                            <option value="manual">Manual</option>
+                            <option value="directory">Directory</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-budget-range">Budget Range</label>
+                        <select id="edit-budget-range" name="budget_range">
+                            <option value="">—</option>
+                            <option value="under_2k">Under $2K</option>
+                            <option value="2k_5k">$2K – $5K</option>
+                            <option value="5k_10k">$5K – $10K</option>
+                            <option value="10k_25k">$10K – $25K</option>
+                            <option value="25k_plus">$25K+</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-urgency">Urgency</label>
+                        <select id="edit-urgency" name="urgency">
+                            <option value="">—</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-funding-status">Funding Status</label>
+                        <select id="edit-funding-status" name="funding_status">
+                            <option value="">—</option>
+                            <option value="none">None</option>
+                            <option value="applied">Applied</option>
+                            <option value="received">Received</option>
+                            <option value="unknown">Unknown</option>
+                        </select>
+                    </div>
                 </div>
             </form>
         </div>
