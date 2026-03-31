@@ -844,3 +844,126 @@
         transform: translateY(0);
     }
 }
+
+/* Tier badges
+   ========================================================================== */
+
+.tier-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.tier-T1 { background: #dc262620; color: #dc2626; }
+.tier-T2 { background: #d9770620; color: #d97706; }
+.tier-T3 { background: #6b728020; color: #6b7280; }
+.tier-T4 { background: #6b728015; color: #9ca3af; }
+.tier-T5 { background: #6b728010; color: #d1d5db; }
+
+/* Progress bar (routing confidence on detail page)
+   ========================================================================== */
+
+.progress-bar-track {
+    width: 100%;
+    max-width: 200px;
+    height: 8px;
+    background: var(--dash-border);
+    border-radius: 4px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--dash-primary);
+    transition: width 0.3s ease;
+}
+
+/* Routing & Scoring section (detail page)
+   ========================================================================== */
+
+.routing-scoring-section {
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    border-radius: var(--dash-radius);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.routing-scoring-section h3 {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dash-text);
+}
+
+.routing-scoring-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.routing-scoring-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.routing-scoring-field .field-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--dash-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.routing-scoring-field .field-value {
+    font-size: 0.85rem;
+    color: var(--dash-text);
+}
+
+.routing-scoring-field.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Urgency color coding */
+
+.urgency-text-low { color: var(--dash-text-muted); }
+.urgency-text-medium { color: #d97706; }
+.urgency-text-high { color: #dc2626; }
+.urgency-text-critical { color: #dc2626; font-weight: 700; }
+
+/* Expandable text block (specialist context) */
+
+.expandable-text {
+    position: relative;
+}
+
+.expandable-text-content {
+    max-height: 3rem;
+    overflow: hidden;
+    font-size: 0.8rem;
+    color: var(--dash-text);
+    line-height: 1.5;
+    transition: max-height 0.3s ease;
+}
+
+.expandable-text-content.expanded {
+    max-height: none;
+}
+
+.expandable-toggle {
+    font-size: 0.75rem;
+    color: var(--dash-primary);
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0.25rem 0;
+}
