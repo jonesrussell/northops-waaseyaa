@@ -985,6 +985,14 @@
     grid-column: 1 / -1;
 }
 
+.form-section-heading {
+    margin: 1.5rem 0 0.75rem;
+    font-size: 0.85rem;
+    color: var(--dash-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
 /* Urgency color coding */
 
 .urgency-text-low { color: var(--dash-text-muted); }
