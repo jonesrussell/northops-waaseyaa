@@ -130,3 +130,6 @@ When modifying a subsystem, update its spec in the same PR.
 - **No `loadByProperties()` on SqlEntityStorage** — Use `getStorage('type')->getQuery()->condition('field', $value)->execute()` for property-based lookups.
 - **ServiceProvider method signatures must match parent exactly** — PHP enforces strict compatibility. Check `ServiceProvider::commands()` and `ServiceProvider::routes()` signatures when overriding.
 - **Always use `vendor/bin/dep deploy`** — never `git pull` on the server directly, as it skips `composer install` and symlink rotation. Run `composer install` locally first if `vendor/bin/dep` is missing.
+- **`NUXT_PUBLIC_BASE_URL` must be `/admin`** — Empty string overrides Nuxt's `??` default. The SPA uses this to prefix `_surface` API calls; without it, requests go to `/_surface/session` instead of `/admin/_surface/session`.
+- **Local SPA builds need `NODE_ENV=production`** — Without it, `npm run generate` can produce dev-mode output with `@vite/client` references that break in production. Always `rm -rf .nuxt .output` before rebuilding.
+- **Caddy `_surface` path has an underscore** — The admin API matcher must use `/admin/_surface/*` (not `/admin/surface/*`). If Ansible state drifts, re-run the waaseyaa-app role.
