@@ -379,8 +379,10 @@ final class LeadController
             $days = 7;
         }
 
+        $autoQualify = $request->query->get('auto_qualify', '0') === '1';
+
         try {
-            $stats = $this->rfpImportService->import($brandId, $days);
+            $stats = $this->rfpImportService->import($brandId, $days, false, $autoQualify);
         } catch (\Throwable $e) {
             return new JsonResponse(['error' => 'Import failed: ' . $e->getMessage()], 502);
         }
@@ -485,6 +487,15 @@ final class LeadController
             'qualify_confidence' => $lead->getQualifyConfidence(),
             'qualify_keywords' => $lead->getQualifyKeywords(),
             'qualify_notes' => $lead->getQualifyNotes(),
+            'tier' => $lead->getTier(),
+            'routing_confidence' => $lead->getRoutingConfidence(),
+            'organization_type' => $lead->getOrganizationType(),
+            'lead_source' => $lead->getLeadSource(),
+            'budget_range' => $lead->getBudgetRange(),
+            'urgency' => $lead->getUrgency(),
+            'funding_status' => $lead->getFundingStatus(),
+            'last_scored_at' => $lead->getLastScoredAt(),
+            'specialist_context' => $lead->getSpecialistContext(),
             'draft_email_subject' => $lead->getDraftEmailSubject(),
             'draft_email_body' => $lead->getDraftEmailBody(),
             'draft_pdf_markdown' => $lead->getDraftPdfMarkdown(),
