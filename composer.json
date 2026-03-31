@@ -28,7 +28,7 @@
         "waaseyaa/full": "^0.1",
         "waaseyaa/github": "^0.1",
         "waaseyaa/graphql": "^0.1",
-        "waaseyaa/http-client": "^0.1.0@alpha",
+        "waaseyaa/http-client": "^0.1",
         "waaseyaa/i18n": "^0.1",
         "waaseyaa/inertia": "^0.1",
         "waaseyaa/ingestion": "^0.1",
@@ -64,8 +64,9 @@
         "sort-packages": true
     },
     "scripts": {
+        "audit-site": "./bin/waaseyaa-audit-site",
         "post-create-project-cmd": [
-            "chmod +x bin/waaseyaa",
+            "chmod +x bin/waaseyaa bin/waaseyaa-version bin/verify-deploy-rsync bin/waaseyaa-audit-site",
             "php bin/post-create-setup.php"
         ]
     },
