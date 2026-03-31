@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Domain\Pipeline\Event\ContactSubmittedEvent;
 use App\Domain\Pipeline\LeadFactory;
 use App\Entity\ContactSubmission;
-use App\Support\DiscordNotifier;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment as Twig;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\User\Middleware\CsrfMiddleware;
@@ -18,7 +19,7 @@ final class MarketingController
     public function __construct(
         private readonly Twig $twig,
         private readonly EntityTypeManager $entityTypeManager,
-        private readonly DiscordNotifier $discordNotifier,
+        private readonly EventDispatcherInterface $dispatcher,
         private readonly ?LeadFactory $leadFactory = null,
         private readonly ?int $defaultBrandId = null,
     ) {}
@@ -95,7 +96,7 @@ final class MarketingController
         $storage = $this->entityTypeManager->getStorage('contact_submission');
         $storage->save($submission);
 
-        $this->discordNotifier->notifyContactSubmission($name, $email, $message);
+        $this->dispatcher->dispatch(new ContactSubmittedEvent($name, $email, $message));
         $this->createLeadFromSubmission($submission);
 
         return new RedirectResponse('/contact?status=success');

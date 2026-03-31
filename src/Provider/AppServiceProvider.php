@@ -7,6 +7,8 @@ namespace App\Provider;
 use App\Controller\Api\LeadController;
 use App\Controller\DashboardController;
 use App\Controller\MarketingController;
+use App\Domain\Pipeline\Event\ContactSubmittedEvent;
+use App\Domain\Pipeline\EventSubscriber\ContactSubmittedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\LeadQualifiedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
@@ -22,6 +24,7 @@ use App\Surface\Action\LeadQualifyAction;
 use App\Surface\Action\LeadTransitionStageAction;
 use App\Surface\LeadSurfaceHost;
 use App\Support\DiscordNotifier;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\AdminSurface\AdminSurfaceServiceProvider;
 use Waaseyaa\Api\Schema\SchemaPresenter;
@@ -133,10 +136,16 @@ final class AppServiceProvider extends ServiceProvider
             $etm = $this->resolve(EntityTypeManager::class);
             $defaultBrandId = $this->resolveDefaultBrandId($etm);
 
+            $dispatcher = $this->resolve(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class);
+            if ($dispatcher instanceof EventDispatcherInterface) {
+                $contactSubscriber = new ContactSubmittedSubscriber($this->getDiscordNotifier());
+                $dispatcher->addListener(ContactSubmittedEvent::class, $contactSubscriber);
+            }
+
             $this->controller = new MarketingController(
                 $twig,
                 $etm,
-                $this->getDiscordNotifier(),
+                $dispatcher,
                 $this->getLeadFactory(),
                 $defaultBrandId,
             );
