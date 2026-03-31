@@ -13,6 +13,7 @@ use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
 use App\Domain\Pipeline\RoutingService;
+use App\Domain\Pipeline\ProspectScoringService;
 use App\Domain\Pipeline\RfpImportService;
 use App\Domain\Qualification\CompanyProfile;
 use App\Domain\Qualification\QualificationService;
@@ -39,7 +40,87 @@ final class AppServiceProvider extends ServiceProvider
     private ?DashboardController $dashboardController = null;
     private ?LeadSurfaceHost $surfaceHost = null;
 
+    private ?DiscordNotifier $discordNotifier = null;
+    private ?LeadManager $leadManager = null;
+    private ?LeadFactory $leadFactory = null;
+    private ?QualificationService $qualificationService = null;
+    private ?LeadQualifiedSubscriber $leadQualifiedSubscriber = null;
+    private ?RfpImportService $rfpImportService = null;
+
     public function register(): void {}
+
+    // ---------------------------------------------------------------
+    // Shared service builders (lazy, cached)
+    // ---------------------------------------------------------------
+
+    private function getDiscordNotifier(): DiscordNotifier
+    {
+        return $this->discordNotifier ??= $this->buildDiscordNotifier();
+    }
+
+    private function buildDiscordNotifier(): DiscordNotifier
+    {
+        return new DiscordNotifier(
+            new StreamHttpClient(timeout: 5.0),
+            $this->config['discord']['webhook_url'] ?? '',
+        );
+    }
+
+    private function getLeadManager(): LeadManager
+    {
+        if ($this->leadManager === null) {
+            $etm = $this->resolve(EntityTypeManager::class);
+            $notifier = $this->getDiscordNotifier();
+            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $notifier);
+            $stageChangedSubscriber = new StageChangedSubscriber($etm, $notifier);
+            $this->leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
+        }
+
+        return $this->leadManager;
+    }
+
+    private function getLeadFactory(): LeadFactory
+    {
+        return $this->leadFactory ??= new LeadFactory(
+            $this->getLeadManager(),
+            $this->resolve(EntityTypeManager::class),
+            new RoutingService(),
+        );
+    }
+
+    private function getQualificationService(): QualificationService
+    {
+        return $this->qualificationService ??= new QualificationService(
+            new StreamHttpClient(),
+            $this->config['pipeline']['anthropic_api_key'] ?? '',
+            new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
+            new ProspectScoringService(),
+        );
+    }
+
+    private function getLeadQualifiedSubscriber(): LeadQualifiedSubscriber
+    {
+        return $this->leadQualifiedSubscriber ??= new LeadQualifiedSubscriber(
+            $this->resolve(EntityTypeManager::class),
+            $this->getDiscordNotifier(),
+        );
+    }
+
+    private function getRfpImportService(): RfpImportService
+    {
+        return $this->rfpImportService ??= new RfpImportService(
+            $this->getLeadFactory(),
+            $this->getLeadManager(),
+            $this->getQualificationService(),
+            $this->getLeadQualifiedSubscriber(),
+            new StreamHttpClient(),
+            $this->config['pipeline']['northcloud_url'] ?? '',
+        );
+    }
+
+    // ---------------------------------------------------------------
+    // Controller builders
+    // ---------------------------------------------------------------
 
     private function controller(): MarketingController
     {
@@ -50,33 +131,18 @@ final class AppServiceProvider extends ServiceProvider
             }
 
             $etm = $this->resolve(EntityTypeManager::class);
-            $discordNotifier = $this->buildDiscordNotifier();
-
-            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordNotifier);
-            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordNotifier);
-            $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
-            $leadFactory = new LeadFactory($leadManager, $etm, new RoutingService());
-
             $defaultBrandId = $this->resolveDefaultBrandId($etm);
 
             $this->controller = new MarketingController(
                 $twig,
                 $etm,
-                $discordNotifier,
-                $leadFactory,
+                $this->getDiscordNotifier(),
+                $this->getLeadFactory(),
                 $defaultBrandId,
             );
         }
 
         return $this->controller;
-    }
-
-    private function buildDiscordNotifier(): DiscordNotifier
-    {
-        return new DiscordNotifier(
-            new StreamHttpClient(timeout: 5.0),
-            $this->config['discord']['webhook_url'] ?? '',
-        );
     }
 
     private function resolveDefaultBrandId(EntityTypeManager $etm): ?int
@@ -115,39 +181,13 @@ final class AppServiceProvider extends ServiceProvider
     private function apiController(): LeadController
     {
         if ($this->apiController === null) {
-            $etm = $this->resolve(EntityTypeManager::class);
-            $httpClient = new StreamHttpClient();
-            $discordNotifier = $this->buildDiscordNotifier();
-
-            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordNotifier);
-            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordNotifier);
-            $leadQualifiedSubscriber = new LeadQualifiedSubscriber($etm, $discordNotifier);
-            $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
-            $leadFactory = new LeadFactory($leadManager, $etm, new RoutingService());
-
-            $qualificationService = new QualificationService(
-                $httpClient,
-                $this->config['pipeline']['anthropic_api_key'] ?? '',
-                new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
-                new \App\Domain\Pipeline\ProspectScoringService(),
-            );
-
-            $rfpImportService = new RfpImportService(
-                $leadFactory,
-                $leadManager,
-                $qualificationService,
-                $leadQualifiedSubscriber,
-                $httpClient,
-                $this->config['pipeline']['northcloud_url'] ?? '',
-            );
-
             $this->apiController = new LeadController(
-                $etm,
-                $leadManager,
-                $leadFactory,
-                $qualificationService,
-                $rfpImportService,
-                $leadQualifiedSubscriber,
+                $this->resolve(EntityTypeManager::class),
+                $this->getLeadManager(),
+                $this->getLeadFactory(),
+                $this->getQualificationService(),
+                $this->getRfpImportService(),
+                $this->getLeadQualifiedSubscriber(),
                 $this->config,
             );
         }
@@ -159,20 +199,12 @@ final class AppServiceProvider extends ServiceProvider
     {
         if ($this->surfaceHost === null) {
             $etm = $this->resolve(EntityTypeManager::class);
-            $httpClient = new StreamHttpClient();
-
-            $qualificationService = new QualificationService(
-                $httpClient,
-                $this->config['pipeline']['anthropic_api_key'] ?? '',
-                new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
-                new \App\Domain\Pipeline\ProspectScoringService(),
-            );
 
             $this->surfaceHost = new LeadSurfaceHost(
                 entityTypeManager: $etm,
                 boardConfigAction: new LeadBoardConfigAction(),
                 transitionAction: new LeadTransitionStageAction($etm),
-                qualifyAction: new LeadQualifyAction($etm, $qualificationService),
+                qualifyAction: new LeadQualifyAction($etm, $this->getQualificationService()),
                 schemaPresenter: new SchemaPresenter(),
             );
         }
