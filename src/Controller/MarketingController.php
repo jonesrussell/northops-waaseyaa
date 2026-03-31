@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment as Twig;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\SSR\SsrResponse;
 use Waaseyaa\User\Middleware\CsrfMiddleware;
 
 final class MarketingController
@@ -26,41 +27,41 @@ final class MarketingController
         private readonly ?int $defaultBrandId = null,
     ) {}
 
-    public function home(): string
+    public function home(): SsrResponse
     {
-        return $this->twig->render('home.html.twig');
+        return new SsrResponse($this->twig->render('home.html.twig'));
     }
 
-    public function about(): string
+    public function about(): SsrResponse
     {
-        return $this->twig->render('about.html.twig');
+        return new SsrResponse($this->twig->render('about.html.twig'));
     }
 
-    public function servicesIndex(): string
+    public function servicesIndex(): SsrResponse
     {
-        return $this->twig->render('services/index.html.twig');
+        return new SsrResponse($this->twig->render('services/index.html.twig'));
     }
 
-    public function serviceDetail(string $slug): string
+    public function serviceDetail(string $slug): SsrResponse
     {
         $template = "services/{$slug}.html.twig";
 
-        return $this->twig->render($template);
+        return new SsrResponse($this->twig->render($template));
     }
 
-    public function contact(Request $request): string
+    public function contact(Request $request): SsrResponse
     {
         $status = $request->query->get('status');
 
-        return $this->twig->render('contact.html.twig', [
+        return new SsrResponse($this->twig->render('contact.html.twig', [
             'status' => $status,
             'errors' => [],
             'old' => [],
             'csrf_token' => CsrfMiddleware::token(),
-        ]);
+        ]));
     }
 
-    public function submitContact(Request $request): RedirectResponse|string
+    public function submitContact(Request $request): RedirectResponse|SsrResponse
     {
         $name = trim((string) $request->request->get('name', ''));
         $email = trim((string) $request->request->get('email', ''));
@@ -69,12 +70,12 @@ final class MarketingController
         $errors = $this->contactValidator->validate($name, $email, $message);
 
         if ($errors !== []) {
-            return $this->twig->render('contact.html.twig', [
+            return new SsrResponse($this->twig->render('contact.html.twig', [
                 'errors' => $errors,
                 'old' => ['name' => $name, 'email' => $email, 'message' => $message],
                 'status' => null,
                 'csrf_token' => CsrfMiddleware::token(),
-            ]);
+            ]));
         }
 
         $submission = new ContactSubmission([

@@ -34,7 +34,6 @@ use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\HttpClient\StreamHttpClient;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
-use Waaseyaa\SSR\SsrResponse;
 use Waaseyaa\SSR\SsrServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
@@ -228,7 +227,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'marketing.home',
             RouteBuilder::create('/')
-                ->controller(fn () => new SsrResponse($this->controller()->home()))
+                ->controller(fn () => $this->controller()->home())
                 ->allowAll()
                 ->methods('GET')
                 ->build(),
@@ -237,7 +236,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'marketing.about',
             RouteBuilder::create('/about')
-                ->controller(fn () => new SsrResponse($this->controller()->about()))
+                ->controller(fn () => $this->controller()->about())
                 ->allowAll()
                 ->methods('GET')
                 ->build(),
@@ -246,7 +245,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'marketing.services',
             RouteBuilder::create('/services')
-                ->controller(fn () => new SsrResponse($this->controller()->servicesIndex()))
+                ->controller(fn () => $this->controller()->servicesIndex())
                 ->allowAll()
                 ->methods('GET')
                 ->build(),
@@ -263,7 +262,7 @@ final class AppServiceProvider extends ServiceProvider
             $router->addRoute(
                 "marketing.services.{$slug}",
                 RouteBuilder::create("/services/{$slug}")
-                    ->controller(fn () => new SsrResponse($this->controller()->serviceDetail($slug)))
+                    ->controller(fn () => $this->controller()->serviceDetail($slug))
                     ->allowAll()
                     ->methods('GET')
                     ->build(),
@@ -277,16 +276,10 @@ final class AppServiceProvider extends ServiceProvider
                     $request = Request::createFromGlobals();
 
                     if ($request->getMethod() === 'POST') {
-                        $result = $this->controller()->submitContact($request);
-
-                        if ($result instanceof \Symfony\Component\HttpFoundation\RedirectResponse) {
-                            return $result;
-                        }
-
-                        return new SsrResponse($result);
+                        return $this->controller()->submitContact($request);
                     }
 
-                    return new SsrResponse($this->controller()->contact($request));
+                    return $this->controller()->contact($request);
                 })
                 ->allowAll()
                 ->methods('GET', 'POST')
@@ -300,7 +293,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'admin.dashboard',
             RouteBuilder::create('/admin')
-                ->controller(fn () => new SsrResponse($this->dashboardController()->index()))
+                ->controller(fn () => $this->dashboardController()->index())
                 ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
@@ -309,7 +302,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'admin.leads',
             RouteBuilder::create('/admin/leads')
-                ->controller(fn () => new SsrResponse($this->dashboardController()->leadList()))
+                ->controller(fn () => $this->dashboardController()->leadList())
                 ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
@@ -318,7 +311,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'admin.lead.detail',
             RouteBuilder::create('/admin/leads/{id}')
-                ->controller(fn (string $id) => new SsrResponse($this->dashboardController()->leadDetail($id)))
+                ->controller(fn (string $id) => $this->dashboardController()->leadDetail($id))
                 ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
@@ -327,7 +320,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'admin.settings',
             RouteBuilder::create('/admin/settings')
-                ->controller(fn () => new SsrResponse($this->dashboardController()->settings()))
+                ->controller(fn () => $this->dashboardController()->settings())
                 ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
