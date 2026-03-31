@@ -246,7 +246,7 @@ final class AppServiceProvider extends ServiceProvider
             'admin.dashboard',
             RouteBuilder::create('/admin')
                 ->controller(fn () => new SsrResponse($this->dashboardController()->index()))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -255,7 +255,7 @@ final class AppServiceProvider extends ServiceProvider
             'admin.leads',
             RouteBuilder::create('/admin/leads')
                 ->controller(fn () => new SsrResponse($this->dashboardController()->leadList()))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -264,7 +264,7 @@ final class AppServiceProvider extends ServiceProvider
             'admin.lead.detail',
             RouteBuilder::create('/admin/leads/{id}')
                 ->controller(fn (string $id) => new SsrResponse($this->dashboardController()->leadDetail($id)))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -273,7 +273,7 @@ final class AppServiceProvider extends ServiceProvider
             'admin.settings',
             RouteBuilder::create('/admin/settings')
                 ->controller(fn () => new SsrResponse($this->dashboardController()->settings()))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -286,7 +286,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.list',
             RouteBuilder::create('/api/leads')
                 ->controller(fn () => $this->apiController()->listLeads(Request::createFromGlobals()))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -295,7 +295,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.create',
             RouteBuilder::create('/api/leads')
                 ->controller(fn () => $this->apiController()->createLead(Request::createFromGlobals()))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('POST')
                 ->build(),
         );
@@ -313,7 +313,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.get',
             RouteBuilder::create('/api/leads/{id}')
                 ->controller(fn (string $id) => $this->apiController()->getLead($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -322,7 +322,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.update',
             RouteBuilder::create('/api/leads/{id}')
                 ->controller(fn (string $id) => $this->apiController()->updateLead(Request::createFromGlobals(), $id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('PATCH')
                 ->build(),
         );
@@ -331,7 +331,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.delete',
             RouteBuilder::create('/api/leads/{id}')
                 ->controller(fn (string $id) => $this->apiController()->deleteLead($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('DELETE')
                 ->build(),
         );
@@ -340,7 +340,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.change_stage',
             RouteBuilder::create('/api/leads/{id}/stage')
                 ->controller(fn (string $id) => $this->apiController()->changeStage(Request::createFromGlobals(), $id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('PATCH')
                 ->build(),
         );
@@ -349,7 +349,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.qualify',
             RouteBuilder::create('/api/leads/{id}/qualify')
                 ->controller(fn (string $id) => $this->apiController()->qualifyLead($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('POST')
                 ->build(),
         );
@@ -358,7 +358,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.activity.list',
             RouteBuilder::create('/api/leads/{id}/activity')
                 ->controller(fn (string $id) => $this->apiController()->listActivity($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -367,7 +367,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.activity.create',
             RouteBuilder::create('/api/leads/{id}/activity')
                 ->controller(fn (string $id) => $this->apiController()->createActivity(Request::createFromGlobals(), $id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('POST')
                 ->build(),
         );
@@ -376,7 +376,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.attachments.list',
             RouteBuilder::create('/api/leads/{id}/attachments')
                 ->controller(fn (string $id) => $this->apiController()->listAttachments($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -385,7 +385,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.brands.list',
             RouteBuilder::create('/api/brands')
                 ->controller(fn () => $this->apiController()->listBrands())
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -394,7 +394,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.config',
             RouteBuilder::create('/api/config')
                 ->controller(fn () => $this->apiController()->getConfig())
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
