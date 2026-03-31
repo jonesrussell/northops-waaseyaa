@@ -9,12 +9,16 @@ use App\Command\OutreachListCommand;
 use App\Command\ScoreLeadsCommand;
 use App\Command\SeedBrandsCommand;
 use App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber;
+use App\Domain\Pipeline\EventSubscriber\LeadQualifiedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
+use App\Domain\Pipeline\RoutingService;
 use App\Domain\Pipeline\OutreachTemplateRenderer;
 use App\Domain\Pipeline\ProspectScoringService;
 use App\Domain\Pipeline\RfpImportService;
+use App\Domain\Qualification\CompanyProfile;
+use App\Domain\Qualification\QualificationService;
 use App\Support\DiscordNotifier;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
@@ -47,12 +51,29 @@ final class PipelineServiceProvider extends ServiceProvider
         $leadCreatedSubscriber = new LeadCreatedSubscriber($entityTypeManager, $discordNotifier);
         $stageChangedSubscriber = new StageChangedSubscriber($entityTypeManager, $discordNotifier);
         $leadManager = new LeadManager($entityTypeManager, $leadCreatedSubscriber, $stageChangedSubscriber);
-        $leadFactory = new LeadFactory($leadManager, $entityTypeManager);
-        $rfpImportService = new RfpImportService($leadFactory, $httpClient, $northcloudUrl);
-
-        $defaultBrandId = $this->resolveDefaultBrandId($entityTypeManager);
+        $routingService = new RoutingService();
+        $leadFactory = new LeadFactory($leadManager, $entityTypeManager, $routingService);
 
         $scoringService = new ProspectScoringService();
+        $leadQualifiedSubscriber = new LeadQualifiedSubscriber($entityTypeManager, $discordNotifier);
+
+        $qualificationService = new QualificationService(
+            $httpClient,
+            $this->config['pipeline']['anthropic_api_key'] ?? '',
+            new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
+            $scoringService,
+        );
+
+        $rfpImportService = new RfpImportService(
+            $leadFactory,
+            $leadManager,
+            $qualificationService,
+            $leadQualifiedSubscriber,
+            $httpClient,
+            $northcloudUrl,
+        );
+
+        $defaultBrandId = $this->resolveDefaultBrandId($entityTypeManager);
         $outreachRenderer = new OutreachTemplateRenderer();
 
         return [

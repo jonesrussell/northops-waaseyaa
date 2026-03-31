@@ -12,6 +12,7 @@ use App\Domain\Pipeline\EventSubscriber\LeadQualifiedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
+use App\Domain\Pipeline\RoutingService;
 use App\Domain\Pipeline\RfpImportService;
 use App\Domain\Qualification\CompanyProfile;
 use App\Domain\Qualification\QualificationService;
@@ -48,7 +49,7 @@ final class AppServiceProvider extends ServiceProvider
             $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordNotifier);
             $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordNotifier);
             $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
-            $leadFactory = new LeadFactory($leadManager, $etm);
+            $leadFactory = new LeadFactory($leadManager, $etm, new RoutingService());
 
             $defaultBrandId = $this->resolveDefaultBrandId($etm);
 
@@ -110,7 +111,7 @@ final class AppServiceProvider extends ServiceProvider
             $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordNotifier);
             $leadQualifiedSubscriber = new LeadQualifiedSubscriber($etm, $discordNotifier);
             $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
-            $leadFactory = new LeadFactory($leadManager, $etm);
+            $leadFactory = new LeadFactory($leadManager, $etm, new RoutingService());
 
             $qualificationService = new QualificationService(
                 $httpClient,
@@ -121,6 +122,9 @@ final class AppServiceProvider extends ServiceProvider
 
             $rfpImportService = new RfpImportService(
                 $leadFactory,
+                $leadManager,
+                $qualificationService,
+                $leadQualifiedSubscriber,
                 $httpClient,
                 $this->config['pipeline']['northcloud_url'] ?? '',
             );
