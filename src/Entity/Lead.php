@@ -143,6 +143,53 @@ final class Lead extends ContentEntityBase
         return (string) ($this->get('sector') ?? '');
     }
 
+    // Scoring & routing
+
+    public function getBudgetRange(): string
+    {
+        return (string) ($this->get('budget_range') ?? '');
+    }
+
+    public function getUrgency(): string
+    {
+        return (string) ($this->get('urgency') ?? '');
+    }
+
+    public function getTier(): string
+    {
+        return (string) ($this->get('tier') ?? '');
+    }
+
+    public function getOrganizationType(): string
+    {
+        return (string) ($this->get('organization_type') ?? '');
+    }
+
+    public function getFundingStatus(): string
+    {
+        return (string) ($this->get('funding_status') ?? '');
+    }
+
+    public function getRoutingConfidence(): int
+    {
+        return (int) ($this->get('routing_confidence') ?? 0);
+    }
+
+    public function getLeadSource(): string
+    {
+        return (string) ($this->get('lead_source') ?? '');
+    }
+
+    public function getLastScoredAt(): string
+    {
+        return (string) ($this->get('last_scored_at') ?? '');
+    }
+
+    public function getSpecialistContext(): string
+    {
+        return (string) ($this->get('specialist_context') ?? '');
+    }
+
     // Drafts
 
     public function getDraftEmailSubject(): string
