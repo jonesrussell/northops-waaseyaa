@@ -11,55 +11,45 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Twig\Environment as Twig;
 use Waaseyaa\Entity\EntityTypeManager;
-use Waaseyaa\SSR\SsrServiceProvider;
 use Waaseyaa\User\Middleware\CsrfMiddleware;
 
 final class MarketingController
 {
     public function __construct(
+        private readonly Twig $twig,
         private readonly EntityTypeManager $entityTypeManager,
         private readonly DiscordNotifier $discordNotifier,
         private readonly ?LeadFactory $leadFactory = null,
         private readonly ?int $defaultBrandId = null,
     ) {}
 
-    private function twig(): Twig
-    {
-        $twig = SsrServiceProvider::getTwigEnvironment();
-        if ($twig === null) {
-            throw new \RuntimeException('Twig environment not initialized');
-        }
-
-        return $twig;
-    }
-
     public function home(): string
     {
-        return $this->twig()->render('home.html.twig');
+        return $this->twig->render('home.html.twig');
     }
 
     public function about(): string
     {
-        return $this->twig()->render('about.html.twig');
+        return $this->twig->render('about.html.twig');
     }
 
     public function servicesIndex(): string
     {
-        return $this->twig()->render('services/index.html.twig');
+        return $this->twig->render('services/index.html.twig');
     }
 
     public function serviceDetail(string $slug): string
     {
         $template = "services/{$slug}.html.twig";
 
-        return $this->twig()->render($template);
+        return $this->twig->render($template);
     }
 
     public function contact(Request $request): string
     {
         $status = $request->query->get('status');
 
-        return $this->twig()->render('contact.html.twig', [
+        return $this->twig->render('contact.html.twig', [
             'status' => $status,
             'errors' => [],
             'old' => [],
@@ -88,7 +78,7 @@ final class MarketingController
         }
 
         if ($errors !== []) {
-            return $this->twig()->render('contact.html.twig', [
+            return $this->twig->render('contact.html.twig', [
                 'errors' => $errors,
                 'old' => ['name' => $name, 'email' => $email, 'message' => $message],
                 'status' => null,

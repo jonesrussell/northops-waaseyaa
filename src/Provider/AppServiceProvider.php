@@ -30,6 +30,7 @@ use Waaseyaa\HttpClient\StreamHttpClient;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\SSR\SsrResponse;
+use Waaseyaa\SSR\SsrServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -43,6 +44,11 @@ final class AppServiceProvider extends ServiceProvider
     private function controller(): MarketingController
     {
         if ($this->controller === null) {
+            $twig = SsrServiceProvider::getTwigEnvironment();
+            if ($twig === null) {
+                throw new \RuntimeException('Twig environment not initialized');
+            }
+
             $etm = $this->resolve(EntityTypeManager::class);
             $discordNotifier = $this->buildDiscordNotifier();
 
@@ -54,6 +60,7 @@ final class AppServiceProvider extends ServiceProvider
             $defaultBrandId = $this->resolveDefaultBrandId($etm);
 
             $this->controller = new MarketingController(
+                $twig,
                 $etm,
                 $discordNotifier,
                 $leadFactory,
@@ -94,7 +101,12 @@ final class AppServiceProvider extends ServiceProvider
     private function dashboardController(): DashboardController
     {
         if ($this->dashboardController === null) {
-            $this->dashboardController = new DashboardController();
+            $twig = SsrServiceProvider::getTwigEnvironment();
+            if ($twig === null) {
+                throw new \RuntimeException('Twig environment not initialized');
+            }
+
+            $this->dashboardController = new DashboardController($twig);
         }
 
         return $this->dashboardController;
