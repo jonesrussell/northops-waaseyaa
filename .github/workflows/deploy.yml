@@ -77,7 +77,7 @@ jobs:
           cd waaseyaa/packages/admin
           npm install --no-audit --no-fund
           export NUXT_PUBLIC_APP_NAME=NorthOps
-          export NUXT_PUBLIC_BASE_URL=
+          export NUXT_PUBLIC_BASE_URL=/admin
           npm run generate
           rm -rf "${GITHUB_WORKSPACE}/public/admin"
           mkdir -p "${GITHUB_WORKSPACE}/public/admin"
