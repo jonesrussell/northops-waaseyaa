@@ -78,6 +78,8 @@ final class ProspectScoringServiceTest extends TestCase
         $this->assertArrayHasKey('score', $result);
         $this->assertArrayHasKey('breakdown', $result);
         $this->assertArrayHasKey('recommended_brand', $result);
+        $this->assertArrayHasKey('tier', $result);
+        $this->assertArrayHasKey('last_scored_at', $result);
 
         $breakdown = $result['breakdown'];
         $this->assertArrayHasKey('sector', $breakdown);
@@ -91,6 +93,53 @@ final class ProspectScoringServiceTest extends TestCase
             (int) array_sum($breakdown),
             $result['score'],
         );
+    }
+
+    public function testTierT1ForHighScore(): void
+    {
+        $result = $this->service->score([
+            'sector' => 'IT',
+            'qualify_rating' => 100,
+            'value' => 120_000.0,
+            'closing_date' => (new \DateTimeImmutable('+14 days'))->format('Y-m-d'),
+            'signal_type' => 'outdated_website',
+        ]);
+
+        $this->assertGreaterThanOrEqual(80, $result['score']);
+        $this->assertSame('T1', $result['tier']);
+    }
+
+    public function testTierT3ForLowScore(): void
+    {
+        $result = $this->service->score([
+            'sector' => 'Other',
+            'qualify_rating' => 2,
+            'value' => 3_000.0,
+            'closing_date' => (new \DateTimeImmutable('-5 days'))->format('Y-m-d'),
+        ]);
+
+        $this->assertLessThan(50, $result['score']);
+        $this->assertSame('T3', $result['tier']);
+    }
+
+    public function testLastScoredAtIsSet(): void
+    {
+        $result = $this->service->score([]);
+
+        $this->assertNotEmpty($result['last_scored_at']);
+        // Should be a valid ISO 8601 date
+        $parsed = \DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, $result['last_scored_at']);
+        $this->assertNotFalse($parsed);
+    }
+
+    public function testTierFromScoreBoundaries(): void
+    {
+        $this->assertSame('T1', ProspectScoringService::tierFromScore(100));
+        $this->assertSame('T1', ProspectScoringService::tierFromScore(80));
+        $this->assertSame('T2', ProspectScoringService::tierFromScore(79));
+        $this->assertSame('T2', ProspectScoringService::tierFromScore(50));
+        $this->assertSame('T3', ProspectScoringService::tierFromScore(49));
+        $this->assertSame('T3', ProspectScoringService::tierFromScore(0));
     }
 
     public function testBrandRoutingTextHeuristic(): void

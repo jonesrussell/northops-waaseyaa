@@ -4,96 +4,78 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Domain\Pipeline\ContactFormValidator;
+use App\Domain\Pipeline\Event\ContactSubmittedEvent;
 use App\Domain\Pipeline\LeadFactory;
 use App\Entity\ContactSubmission;
-use App\Support\DiscordNotifier;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment as Twig;
 use Waaseyaa\Entity\EntityTypeManager;
-use Waaseyaa\SSR\SsrServiceProvider;
+use Waaseyaa\SSR\SsrResponse;
 use Waaseyaa\User\Middleware\CsrfMiddleware;
 
 final class MarketingController
 {
     public function __construct(
+        private readonly Twig $twig,
         private readonly EntityTypeManager $entityTypeManager,
-        private readonly DiscordNotifier $discordNotifier,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly ContactFormValidator $contactValidator,
         private readonly ?LeadFactory $leadFactory = null,
         private readonly ?int $defaultBrandId = null,
     ) {}
 
-    private function twig(): Twig
+    public function home(): SsrResponse
     {
-        $twig = SsrServiceProvider::getTwigEnvironment();
-        if ($twig === null) {
-            throw new \RuntimeException('Twig environment not initialized');
-        }
-
-        return $twig;
+        return new SsrResponse($this->twig->render('home.html.twig'));
     }
 
-    public function home(): string
+    public function about(): SsrResponse
     {
-        return $this->twig()->render('home.html.twig');
+        return new SsrResponse($this->twig->render('about.html.twig'));
     }
 
-    public function about(): string
+    public function servicesIndex(): SsrResponse
     {
-        return $this->twig()->render('about.html.twig');
+        return new SsrResponse($this->twig->render('services/index.html.twig'));
     }
 
-    public function servicesIndex(): string
-    {
-        return $this->twig()->render('services/index.html.twig');
-    }
-
-    public function serviceDetail(string $slug): string
+    public function serviceDetail(string $slug): SsrResponse
     {
         $template = "services/{$slug}.html.twig";
 
-        return $this->twig()->render($template);
+        return new SsrResponse($this->twig->render($template));
     }
 
-    public function contact(Request $request): string
+    public function contact(Request $request): SsrResponse
     {
         $status = $request->query->get('status');
 
-        return $this->twig()->render('contact.html.twig', [
+        return new SsrResponse($this->twig->render('contact.html.twig', [
             'status' => $status,
             'errors' => [],
             'old' => [],
             'csrf_token' => CsrfMiddleware::token(),
-        ]);
+        ]));
     }
 
-    public function submitContact(Request $request): RedirectResponse|string
+    public function submitContact(Request $request): RedirectResponse|SsrResponse
     {
         $name = trim((string) $request->request->get('name', ''));
         $email = trim((string) $request->request->get('email', ''));
         $message = trim((string) $request->request->get('message', ''));
 
-        $errors = [];
-
-        if ($name === '' || strlen($name) > 255) {
-            $errors['name'] = 'Name is required (max 255 characters).';
-        }
-
-        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 255) {
-            $errors['email'] = 'A valid email address is required.';
-        }
-
-        if ($message === '' || strlen($message) > 5000) {
-            $errors['message'] = 'Message is required (max 5000 characters).';
-        }
+        $errors = $this->contactValidator->validate($name, $email, $message);
 
         if ($errors !== []) {
-            return $this->twig()->render('contact.html.twig', [
+            return new SsrResponse($this->twig->render('contact.html.twig', [
                 'errors' => $errors,
                 'old' => ['name' => $name, 'email' => $email, 'message' => $message],
                 'status' => null,
                 'csrf_token' => CsrfMiddleware::token(),
-            ]);
+            ]));
         }
 
         $submission = new ContactSubmission([
@@ -105,7 +87,7 @@ final class MarketingController
         $storage = $this->entityTypeManager->getStorage('contact_submission');
         $storage->save($submission);
 
-        $this->discordNotifier->notifyContactSubmission($name, $email, $message);
+        $this->dispatcher->dispatch(new ContactSubmittedEvent($name, $email, $message));
         $this->createLeadFromSubmission($submission);
 
         return new RedirectResponse('/contact?status=success');

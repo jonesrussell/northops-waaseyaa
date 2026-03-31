@@ -7,11 +7,16 @@ namespace App\Provider;
 use App\Controller\Api\LeadController;
 use App\Controller\DashboardController;
 use App\Controller\MarketingController;
+use App\Domain\Pipeline\ContactFormValidator;
+use App\Domain\Pipeline\Event\ContactSubmittedEvent;
+use App\Domain\Pipeline\EventSubscriber\ContactSubmittedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\LeadQualifiedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
+use App\Domain\Pipeline\RoutingService;
+use App\Domain\Pipeline\ProspectScoringService;
 use App\Domain\Pipeline\RfpImportService;
 use App\Domain\Qualification\CompanyProfile;
 use App\Domain\Qualification\QualificationService;
@@ -20,6 +25,7 @@ use App\Surface\Action\LeadQualifyAction;
 use App\Surface\Action\LeadTransitionStageAction;
 use App\Surface\LeadSurfaceHost;
 use App\Support\DiscordNotifier;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\AdminSurface\AdminSurfaceServiceProvider;
 use Waaseyaa\Api\Schema\SchemaPresenter;
@@ -28,7 +34,7 @@ use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\HttpClient\StreamHttpClient;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
-use Waaseyaa\SSR\SsrResponse;
+use Waaseyaa\SSR\SsrServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -37,30 +43,22 @@ final class AppServiceProvider extends ServiceProvider
     private ?DashboardController $dashboardController = null;
     private ?LeadSurfaceHost $surfaceHost = null;
 
+    private ?DiscordNotifier $discordNotifier = null;
+    private ?LeadManager $leadManager = null;
+    private ?LeadFactory $leadFactory = null;
+    private ?QualificationService $qualificationService = null;
+    private ?LeadQualifiedSubscriber $leadQualifiedSubscriber = null;
+    private ?RfpImportService $rfpImportService = null;
+
     public function register(): void {}
 
-    private function controller(): MarketingController
+    // ---------------------------------------------------------------
+    // Shared service builders (lazy, cached)
+    // ---------------------------------------------------------------
+
+    private function getDiscordNotifier(): DiscordNotifier
     {
-        if ($this->controller === null) {
-            $etm = $this->resolve(EntityTypeManager::class);
-            $discordNotifier = $this->buildDiscordNotifier();
-
-            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordNotifier);
-            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordNotifier);
-            $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
-            $leadFactory = new LeadFactory($leadManager, $etm);
-
-            $defaultBrandId = $this->resolveDefaultBrandId($etm);
-
-            $this->controller = new MarketingController(
-                $etm,
-                $discordNotifier,
-                $leadFactory,
-                $defaultBrandId,
-            );
-        }
-
-        return $this->controller;
+        return $this->discordNotifier ??= $this->buildDiscordNotifier();
     }
 
     private function buildDiscordNotifier(): DiscordNotifier
@@ -69,6 +67,92 @@ final class AppServiceProvider extends ServiceProvider
             new StreamHttpClient(timeout: 5.0),
             $this->config['discord']['webhook_url'] ?? '',
         );
+    }
+
+    private function getLeadManager(): LeadManager
+    {
+        if ($this->leadManager === null) {
+            $etm = $this->resolve(EntityTypeManager::class);
+            $notifier = $this->getDiscordNotifier();
+            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $notifier);
+            $stageChangedSubscriber = new StageChangedSubscriber($etm, $notifier);
+            $this->leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
+        }
+
+        return $this->leadManager;
+    }
+
+    private function getLeadFactory(): LeadFactory
+    {
+        return $this->leadFactory ??= new LeadFactory(
+            $this->getLeadManager(),
+            $this->resolve(EntityTypeManager::class),
+            new RoutingService(),
+        );
+    }
+
+    private function getQualificationService(): QualificationService
+    {
+        return $this->qualificationService ??= new QualificationService(
+            new StreamHttpClient(),
+            $this->config['pipeline']['anthropic_api_key'] ?? '',
+            new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
+            new ProspectScoringService(),
+        );
+    }
+
+    private function getLeadQualifiedSubscriber(): LeadQualifiedSubscriber
+    {
+        return $this->leadQualifiedSubscriber ??= new LeadQualifiedSubscriber(
+            $this->resolve(EntityTypeManager::class),
+            $this->getDiscordNotifier(),
+        );
+    }
+
+    private function getRfpImportService(): RfpImportService
+    {
+        return $this->rfpImportService ??= new RfpImportService(
+            $this->getLeadFactory(),
+            $this->getLeadManager(),
+            $this->getQualificationService(),
+            $this->getLeadQualifiedSubscriber(),
+            new StreamHttpClient(),
+            $this->config['pipeline']['northcloud_url'] ?? '',
+        );
+    }
+
+    // ---------------------------------------------------------------
+    // Controller builders
+    // ---------------------------------------------------------------
+
+    private function controller(): MarketingController
+    {
+        if ($this->controller === null) {
+            $twig = SsrServiceProvider::getTwigEnvironment();
+            if ($twig === null) {
+                throw new \RuntimeException('Twig environment not initialized');
+            }
+
+            $etm = $this->resolve(EntityTypeManager::class);
+            $defaultBrandId = $this->resolveDefaultBrandId($etm);
+
+            $dispatcher = $this->resolve(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class);
+            if ($dispatcher instanceof EventDispatcherInterface) {
+                $contactSubscriber = new ContactSubmittedSubscriber($this->getDiscordNotifier());
+                $dispatcher->addListener(ContactSubmittedEvent::class, $contactSubscriber);
+            }
+
+            $this->controller = new MarketingController(
+                $twig,
+                $etm,
+                $dispatcher,
+                new ContactFormValidator(),
+                $this->getLeadFactory(),
+                $defaultBrandId,
+            );
+        }
+
+        return $this->controller;
     }
 
     private function resolveDefaultBrandId(EntityTypeManager $etm): ?int
@@ -93,7 +177,12 @@ final class AppServiceProvider extends ServiceProvider
     private function dashboardController(): DashboardController
     {
         if ($this->dashboardController === null) {
-            $this->dashboardController = new DashboardController();
+            $twig = SsrServiceProvider::getTwigEnvironment();
+            if ($twig === null) {
+                throw new \RuntimeException('Twig environment not initialized');
+            }
+
+            $this->dashboardController = new DashboardController($twig);
         }
 
         return $this->dashboardController;
@@ -102,36 +191,13 @@ final class AppServiceProvider extends ServiceProvider
     private function apiController(): LeadController
     {
         if ($this->apiController === null) {
-            $etm = $this->resolve(EntityTypeManager::class);
-            $httpClient = new StreamHttpClient();
-            $discordNotifier = $this->buildDiscordNotifier();
-
-            $leadCreatedSubscriber = new LeadCreatedSubscriber($etm, $discordNotifier);
-            $stageChangedSubscriber = new StageChangedSubscriber($etm, $discordNotifier);
-            $leadQualifiedSubscriber = new LeadQualifiedSubscriber($etm, $discordNotifier);
-            $leadManager = new LeadManager($etm, $leadCreatedSubscriber, $stageChangedSubscriber);
-            $leadFactory = new LeadFactory($leadManager, $etm);
-
-            $qualificationService = new QualificationService(
-                $httpClient,
-                $this->config['pipeline']['anthropic_api_key'] ?? '',
-                new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
-                new \App\Domain\Pipeline\ProspectScoringService(),
-            );
-
-            $rfpImportService = new RfpImportService(
-                $leadFactory,
-                $httpClient,
-                $this->config['pipeline']['northcloud_url'] ?? '',
-            );
-
             $this->apiController = new LeadController(
-                $etm,
-                $leadManager,
-                $leadFactory,
-                $qualificationService,
-                $rfpImportService,
-                $leadQualifiedSubscriber,
+                $this->resolve(EntityTypeManager::class),
+                $this->getLeadManager(),
+                $this->getLeadFactory(),
+                $this->getQualificationService(),
+                $this->getRfpImportService(),
+                $this->getLeadQualifiedSubscriber(),
                 $this->config,
             );
         }
@@ -143,20 +209,12 @@ final class AppServiceProvider extends ServiceProvider
     {
         if ($this->surfaceHost === null) {
             $etm = $this->resolve(EntityTypeManager::class);
-            $httpClient = new StreamHttpClient();
-
-            $qualificationService = new QualificationService(
-                $httpClient,
-                $this->config['pipeline']['anthropic_api_key'] ?? '',
-                new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
-                new \App\Domain\Pipeline\ProspectScoringService(),
-            );
 
             $this->surfaceHost = new LeadSurfaceHost(
                 entityTypeManager: $etm,
                 boardConfigAction: new LeadBoardConfigAction(),
                 transitionAction: new LeadTransitionStageAction($etm),
-                qualifyAction: new LeadQualifyAction($etm, $qualificationService),
+                qualifyAction: new LeadQualifyAction($etm, $this->getQualificationService()),
                 schemaPresenter: new SchemaPresenter(),
             );
         }
@@ -169,7 +227,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'marketing.home',
             RouteBuilder::create('/')
-                ->controller(fn () => new SsrResponse($this->controller()->home()))
+                ->controller(fn () => $this->controller()->home())
                 ->allowAll()
                 ->methods('GET')
                 ->build(),
@@ -178,7 +236,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'marketing.about',
             RouteBuilder::create('/about')
-                ->controller(fn () => new SsrResponse($this->controller()->about()))
+                ->controller(fn () => $this->controller()->about())
                 ->allowAll()
                 ->methods('GET')
                 ->build(),
@@ -187,7 +245,7 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'marketing.services',
             RouteBuilder::create('/services')
-                ->controller(fn () => new SsrResponse($this->controller()->servicesIndex()))
+                ->controller(fn () => $this->controller()->servicesIndex())
                 ->allowAll()
                 ->methods('GET')
                 ->build(),
@@ -204,7 +262,7 @@ final class AppServiceProvider extends ServiceProvider
             $router->addRoute(
                 "marketing.services.{$slug}",
                 RouteBuilder::create("/services/{$slug}")
-                    ->controller(fn () => new SsrResponse($this->controller()->serviceDetail($slug)))
+                    ->controller(fn () => $this->controller()->serviceDetail($slug))
                     ->allowAll()
                     ->methods('GET')
                     ->build(),
@@ -218,16 +276,10 @@ final class AppServiceProvider extends ServiceProvider
                     $request = Request::createFromGlobals();
 
                     if ($request->getMethod() === 'POST') {
-                        $result = $this->controller()->submitContact($request);
-
-                        if ($result instanceof \Symfony\Component\HttpFoundation\RedirectResponse) {
-                            return $result;
-                        }
-
-                        return new SsrResponse($result);
+                        return $this->controller()->submitContact($request);
                     }
 
-                    return new SsrResponse($this->controller()->contact($request));
+                    return $this->controller()->contact($request);
                 })
                 ->allowAll()
                 ->methods('GET', 'POST')
@@ -241,8 +293,8 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'admin.dashboard',
             RouteBuilder::create('/admin')
-                ->controller(fn () => new SsrResponse($this->dashboardController()->index()))
-                ->allowAll()
+                ->controller(fn () => $this->dashboardController()->index())
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -250,8 +302,8 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'admin.leads',
             RouteBuilder::create('/admin/leads')
-                ->controller(fn () => new SsrResponse($this->dashboardController()->leadList()))
-                ->allowAll()
+                ->controller(fn () => $this->dashboardController()->leadList())
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -259,8 +311,8 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'admin.lead.detail',
             RouteBuilder::create('/admin/leads/{id}')
-                ->controller(fn (string $id) => new SsrResponse($this->dashboardController()->leadDetail($id)))
-                ->allowAll()
+                ->controller(fn (string $id) => $this->dashboardController()->leadDetail($id))
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -268,8 +320,8 @@ final class AppServiceProvider extends ServiceProvider
         $router->addRoute(
             'admin.settings',
             RouteBuilder::create('/admin/settings')
-                ->controller(fn () => new SsrResponse($this->dashboardController()->settings()))
-                ->allowAll()
+                ->controller(fn () => $this->dashboardController()->settings())
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -282,7 +334,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.list',
             RouteBuilder::create('/api/leads')
                 ->controller(fn () => $this->apiController()->listLeads(Request::createFromGlobals()))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -291,7 +343,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.create',
             RouteBuilder::create('/api/leads')
                 ->controller(fn () => $this->apiController()->createLead(Request::createFromGlobals()))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('POST')
                 ->build(),
         );
@@ -309,7 +361,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.get',
             RouteBuilder::create('/api/leads/{id}')
                 ->controller(fn (string $id) => $this->apiController()->getLead($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -318,7 +370,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.update',
             RouteBuilder::create('/api/leads/{id}')
                 ->controller(fn (string $id) => $this->apiController()->updateLead(Request::createFromGlobals(), $id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('PATCH')
                 ->build(),
         );
@@ -327,7 +379,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.delete',
             RouteBuilder::create('/api/leads/{id}')
                 ->controller(fn (string $id) => $this->apiController()->deleteLead($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('DELETE')
                 ->build(),
         );
@@ -336,7 +388,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.change_stage',
             RouteBuilder::create('/api/leads/{id}/stage')
                 ->controller(fn (string $id) => $this->apiController()->changeStage(Request::createFromGlobals(), $id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('PATCH')
                 ->build(),
         );
@@ -345,7 +397,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.qualify',
             RouteBuilder::create('/api/leads/{id}/qualify')
                 ->controller(fn (string $id) => $this->apiController()->qualifyLead($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('POST')
                 ->build(),
         );
@@ -354,7 +406,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.activity.list',
             RouteBuilder::create('/api/leads/{id}/activity')
                 ->controller(fn (string $id) => $this->apiController()->listActivity($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -363,7 +415,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.activity.create',
             RouteBuilder::create('/api/leads/{id}/activity')
                 ->controller(fn (string $id) => $this->apiController()->createActivity(Request::createFromGlobals(), $id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('POST')
                 ->build(),
         );
@@ -372,7 +424,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.leads.attachments.list',
             RouteBuilder::create('/api/leads/{id}/attachments')
                 ->controller(fn (string $id) => $this->apiController()->listAttachments($id))
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -381,7 +433,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.brands.list',
             RouteBuilder::create('/api/brands')
                 ->controller(fn () => $this->apiController()->listBrands())
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );
@@ -390,7 +442,7 @@ final class AppServiceProvider extends ServiceProvider
             'api.config',
             RouteBuilder::create('/api/config')
                 ->controller(fn () => $this->apiController()->getConfig())
-                ->allowAll()
+                ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
         );

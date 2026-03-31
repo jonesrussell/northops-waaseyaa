@@ -69,6 +69,27 @@
         return brands.find(function (b) { return b.id == brandId; });
     }
 
+    function tierLabel(tier) {
+        if (!tier) return null;
+        var labels = { T1: 'T1 — Hot', T2: 'T2 — Warm', T3: 'T3 — Cold', T4: 'T4', T5: 'T5' };
+        return labels[tier] || tier;
+    }
+
+    function formatRelativeTime(dateStr) {
+        if (!dateStr) return '';
+        var now = new Date();
+        var then = new Date(dateStr);
+        var diffMs = now - then;
+        var diffMins = Math.floor(diffMs / 60000);
+        if (diffMins < 1) return 'just now';
+        if (diffMins < 60) return diffMins + 'm ago';
+        var diffHrs = Math.floor(diffMins / 60);
+        if (diffHrs < 24) return diffHrs + 'h ago';
+        var diffDays = Math.floor(diffHrs / 24);
+        if (diffDays < 30) return diffDays + 'd ago';
+        return formatDate(dateStr);
+    }
+
     function showToast(message, type) {
         type = type || 'info';
         var container = document.querySelector('.toast-container');
@@ -241,21 +262,28 @@
         var scoreClass = score >= 70 ? 'score-high' : score >= 40 ? 'score-mid' : 'score-low';
         var urgency = getUrgency(lead.closing_date);
 
-        // Card header
+        // Card header: label + tier badge (or score badge if no tier)
         var headerChildren = [el('span', { className: 'card-label', textContent: lead.label || '' })];
-        if (score != null) {
+        if (lead.tier) {
+            headerChildren.push(el('span', {
+                className: 'tier-badge tier-' + lead.tier,
+                textContent: lead.tier,
+            }));
+        } else if (score != null) {
             headerChildren.push(el('span', { className: 'score-badge ' + scoreClass, textContent: String(score) }));
         }
         var cardHeader = el('div', { className: 'card-header' }, headerChildren);
 
-        // Card body parts
         var parts = [cardHeader];
 
         if (lead.company_name) {
             parts.push(el('div', { className: 'card-company', textContent: lead.company_name }));
         }
 
-        // Meta row
+        if (lead.organization_type) {
+            parts.push(el('span', { className: 'org-type-tag', textContent: lead.organization_type }));
+        }
+
         var metaChildren = [];
         if (brand) {
             metaChildren.push(el('span', {
@@ -264,8 +292,13 @@
                 textContent: brand.name,
             }));
         }
-        if (lead.source) {
+        if (lead.lead_source) {
+            metaChildren.push(el('span', { className: 'lead-source-tag', textContent: lead.lead_source }));
+        } else if (lead.source) {
             metaChildren.push(el('span', { className: 'source-tag', textContent: lead.source }));
+        }
+        if (lead.routing_confidence != null) {
+            metaChildren.push(el('span', { className: 'routing-confidence', textContent: lead.routing_confidence + '%' }));
         }
         if (urgency) {
             metaChildren.push(el('span', { className: 'urgency-badge urgency-' + urgency.level, textContent: urgency.label }));
@@ -316,7 +349,7 @@
 
         if (filtered.length === 0) {
             var emptyRow = el('tr', {}, [el('td', { className: 'empty-state' }, ['No leads found'])]);
-            emptyRow.querySelector('td').setAttribute('colspan', '9');
+            emptyRow.querySelector('td').setAttribute('colspan', '13');
             tbody.appendChild(emptyRow);
             return;
         }
@@ -353,6 +386,28 @@
                 scoreCell.appendChild(el('span', { className: 'score-badge ' + scoreClass, textContent: String(score) }));
             }
             cells.push(scoreCell);
+            // Tier
+            var tierCell = el('td');
+            if (l.tier) {
+                tierCell.appendChild(el('span', { className: 'tier-badge tier-' + l.tier, textContent: l.tier }));
+            }
+            cells.push(tierCell);
+            // Routing
+            var routingCell = el('td');
+            if (l.routing_confidence != null) {
+                var routingText = l.routing_confidence + '%';
+                if (brand) routingText += ' · ' + brand.name;
+                routingCell.appendChild(el('span', { className: 'routing-confidence', textContent: routingText }));
+            }
+            cells.push(routingCell);
+            // Org Type
+            cells.push(el('td', { textContent: l.organization_type || '' }));
+            // Lead Source
+            var sourceCell2 = el('td');
+            if (l.lead_source) {
+                sourceCell2.appendChild(el('span', { className: 'lead-source-tag', textContent: l.lead_source }));
+            }
+            cells.push(sourceCell2);
             // Value
             cells.push(el('td', { textContent: l.value ? '$' + Number(l.value).toLocaleString() : '' }));
             // Closing
@@ -429,6 +484,7 @@
             populateDetailFields(lead);
             renderStageActions(lead);
             renderQualification(lead);
+            renderRoutingScoring(lead);
         } catch (err) {
             showToast('Failed to load lead: ' + err.message, 'error');
         }
@@ -465,6 +521,12 @@
         setFieldValue('edit-value', lead.value);
         setFieldValue('edit-closing-date', lead.closing_date ? lead.closing_date.substring(0, 10) : '');
         setFieldValue('edit-description', lead.description);
+        setFieldValue('edit-tier', lead.tier);
+        setFieldValue('edit-organization-type', lead.organization_type);
+        setFieldValue('edit-lead-source', lead.lead_source);
+        setFieldValue('edit-budget-range', lead.budget_range);
+        setFieldValue('edit-urgency', lead.urgency);
+        setFieldValue('edit-funding-status', lead.funding_status);
     }
 
     function setFieldValue(id, value) {
@@ -516,6 +578,111 @@
         var reasoningEl = document.getElementById('qual-reasoning');
         if (reasoningEl) {
             reasoningEl.textContent = lead.qualify_reasoning || '';
+        }
+    }
+
+    function renderRoutingScoring(lead) {
+        var section = document.getElementById('routing-scoring-section');
+        if (!section) return;
+
+        var hasData = lead.tier || lead.routing_confidence != null || lead.organization_type ||
+            lead.lead_source || lead.budget_range || lead.urgency || lead.funding_status ||
+            lead.last_scored_at || lead.specialist_context;
+
+        if (!hasData) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = '';
+        var grid = document.getElementById('routing-scoring-grid');
+        grid.textContent = '';
+
+        if (lead.tier) {
+            grid.appendChild(el('div', { className: 'routing-scoring-field' }, [
+                el('span', { className: 'field-label', textContent: 'Tier' }),
+                el('span', {
+                    className: 'tier-badge tier-' + lead.tier,
+                    style: 'font-size:1rem;padding:0.25rem 0.6rem;',
+                    textContent: tierLabel(lead.tier),
+                }),
+            ]));
+        }
+
+        if (lead.routing_confidence != null) {
+            var progressBar = el('div', { className: 'progress-bar-track' }, [
+                el('div', {
+                    className: 'progress-bar-fill',
+                    style: 'width:' + Math.min(100, Math.max(0, lead.routing_confidence)) + '%',
+                }),
+            ]);
+            grid.appendChild(el('div', { className: 'routing-scoring-field' }, [
+                el('span', { className: 'field-label', textContent: 'Routing Confidence' }),
+                el('div', { className: 'field-value' }, [progressBar, ' ' + lead.routing_confidence + '%']),
+            ]));
+        }
+
+        if (lead.organization_type) {
+            grid.appendChild(el('div', { className: 'routing-scoring-field' }, [
+                el('span', { className: 'field-label', textContent: 'Organization Type' }),
+                el('span', { className: 'field-value', textContent: lead.organization_type }),
+            ]));
+        }
+
+        if (lead.lead_source) {
+            grid.appendChild(el('div', { className: 'routing-scoring-field' }, [
+                el('span', { className: 'field-label', textContent: 'Lead Source' }),
+                el('span', { className: 'field-value', textContent: lead.lead_source }),
+            ]));
+        }
+
+        if (lead.budget_range) {
+            grid.appendChild(el('div', { className: 'routing-scoring-field' }, [
+                el('span', { className: 'field-label', textContent: 'Budget Range' }),
+                el('span', { className: 'field-value', textContent: lead.budget_range.replace(/_/g, ' ') }),
+            ]));
+        }
+
+        if (lead.urgency) {
+            grid.appendChild(el('div', { className: 'routing-scoring-field' }, [
+                el('span', { className: 'field-label', textContent: 'Urgency' }),
+                el('span', {
+                    className: 'field-value urgency-text-' + lead.urgency,
+                    textContent: lead.urgency,
+                }),
+            ]));
+        }
+
+        if (lead.funding_status) {
+            grid.appendChild(el('div', { className: 'routing-scoring-field' }, [
+                el('span', { className: 'field-label', textContent: 'Funding Status' }),
+                el('span', { className: 'field-value', textContent: lead.funding_status }),
+            ]));
+        }
+
+        if (lead.last_scored_at) {
+            grid.appendChild(el('div', { className: 'routing-scoring-field' }, [
+                el('span', { className: 'field-label', textContent: 'Last Scored' }),
+                el('span', { className: 'field-value', textContent: formatRelativeTime(lead.last_scored_at) }),
+            ]));
+        }
+
+        if (lead.specialist_context) {
+            var contextText = typeof lead.specialist_context === 'string'
+                ? lead.specialist_context
+                : JSON.stringify(lead.specialist_context, null, 2);
+
+            var contentDiv = el('div', { className: 'expandable-text-content', textContent: contextText });
+            var toggleBtn = el('button', { className: 'expandable-toggle', textContent: 'Show more' });
+            toggleBtn.addEventListener('click', function () {
+                var isExpanded = contentDiv.classList.toggle('expanded');
+                toggleBtn.textContent = isExpanded ? 'Show less' : 'Show more';
+            });
+
+            grid.appendChild(el('div', { className: 'routing-scoring-field full-width' }, [
+                el('span', { className: 'field-label', textContent: 'Specialist Context' }),
+                el('div', { className: 'expandable-text' }, [contentDiv, toggleBtn]),
+            ]));
         }
     }
 

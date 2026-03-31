@@ -6,6 +6,11 @@ namespace App\Domain\Pipeline;
 
 final class ProspectScoringService
 {
+    /**
+     * Leads scoring below this threshold are flagged as low-relevance.
+     */
+    public const MINIMUM_SCORE = 15;
+
     private const ALLOWED_SECTORS = [
         'IT', 'Networks', 'Security', 'Cloud', 'Telecom',
         'Software', 'Infrastructure', 'DevOps', 'AI',
@@ -35,7 +40,7 @@ final class ProspectScoringService
      *     description?: ?string,
      * } $input
      *
-     * @return array{score: int, breakdown: array{sector: int, qualification: int, value: int, urgency: int, signal: int}, recommended_brand: string}
+     * @return array{score: int, breakdown: array{sector: int, qualification: int, value: int, urgency: int, signal: int}, recommended_brand: string, tier: string, last_scored_at: string, low_relevance: bool}
      */
     public function score(array $input): array
     {
@@ -47,11 +52,28 @@ final class ProspectScoringService
             'signal' => $this->scoreSignal($input['signal_type'] ?? null),
         ];
 
+        $total = (int) array_sum($breakdown);
+
         return [
-            'score' => (int) array_sum($breakdown),
+            'score' => $total,
             'breakdown' => $breakdown,
             'recommended_brand' => $this->routeBrand($input),
+            'tier' => self::tierFromScore($total),
+            'last_scored_at' => date('c'),
+            'low_relevance' => $total < self::MINIMUM_SCORE,
         ];
+    }
+
+    public static function tierFromScore(int $score): string
+    {
+        if ($score >= 80) {
+            return 'T1';
+        }
+        if ($score >= 50) {
+            return 'T2';
+        }
+
+        return 'T3';
     }
 
     private function scoreSector(?string $sector): int
@@ -69,9 +91,9 @@ final class ProspectScoringService
             return 0;
         }
 
-        $clamped = max(0, min(10, $rating));
+        $clamped = max(0, min(100, $rating));
 
-        return (int) round(($clamped / 10) * 25);
+        return (int) round(($clamped / 100) * 25);
     }
 
     private function scoreValue(?float $value): int

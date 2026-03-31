@@ -11,9 +11,26 @@ use Waaseyaa\Entity\EntityTypeManager;
 
 final class LeadFactory
 {
+    /**
+     * Keywords that indicate an RFP is relevant to IT/web services.
+     * At least one must appear in title or description for import.
+     */
+    private const IT_RELEVANCE_KEYWORDS = [
+        'software', 'website', 'web ', 'web-', ' it ', 'cloud', 'network',
+        'cybersecurity', 'cyber', 'infrastructure', 'telecom', 'saas',
+        'devops', 'hosting', 'migration', 'digital', 'application',
+        'database', 'server', 'computing', 'data centre', 'data center',
+        'information technology', 'managed services', 'helpdesk', 'help desk',
+        'firewall', 'erp', 'crm', 'api', 'platform', 'automation',
+    ];
+
+    /** @var array<string, int> Cached brand slug → ID mappings */
+    private array $brandCache = [];
+
     public function __construct(
         private readonly LeadManager $leadManager,
         private readonly EntityTypeManager $entityTypeManager,
+        private readonly RoutingService $routingService,
     ) {}
 
     /**
@@ -21,14 +38,16 @@ final class LeadFactory
      */
     public function fromContactSubmission(ContactSubmission $submission, int $brandId): Lead
     {
-        return $this->leadManager->create([
+        $data = [
             'label' => mb_substr($submission->getMessage(), 0, 255),
             'brand_id' => $brandId,
             'source' => 'inbound',
             'stage' => 'lead',
             'contact_name' => $submission->getName(),
             'contact_email' => $submission->getEmail(),
-        ]);
+        ];
+
+        return $this->leadManager->create($this->applyRouting($data));
     }
 
     /**
@@ -49,6 +68,10 @@ final class LeadFactory
             if ($existing !== []) {
                 return null;
             }
+        }
+
+        if (!$this->isItRelevant($rfpData)) {
+            return null;
         }
 
         $sector = SectorNormalizer::normalize($rfpData['sector'] ?? null);
@@ -74,7 +97,7 @@ final class LeadFactory
             $data['qualify_rating'] = (int) $rfpData['qualify_rating'];
         }
 
-        return $this->leadManager->create($data);
+        return $this->leadManager->create($this->applyRouting($data));
     }
 
     /**
@@ -84,6 +107,71 @@ final class LeadFactory
      */
     public function fromManualEntry(array $data): Lead
     {
-        return $this->leadManager->create($data);
+        return $this->leadManager->create($this->applyRouting($data));
+    }
+
+    /**
+     * Run routing rules and enrich lead data with brand assignment and confidence.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function applyRouting(array $data): array
+    {
+        $result = $this->routingService->route($data);
+
+        $data['routing_confidence'] = $result['confidence'];
+
+        // Only override brand_id if routing resolved to a specific brand
+        if (\in_array($result['brand'], ['northops', 'webnet'], true)) {
+            $resolvedId = $this->resolveBrandId($result['brand']);
+            if ($resolvedId > 0) {
+                $data['brand_id'] = $resolvedId;
+            }
+        }
+
+        return $data;
+    }
+
+    private function resolveBrandId(string $slug): int
+    {
+        if (isset($this->brandCache[$slug])) {
+            return $this->brandCache[$slug];
+        }
+
+        try {
+            $ids = $this->entityTypeManager->getStorage('brand')->getQuery()
+                ->accessCheck(false)
+                ->condition('slug', $slug)
+                ->execute();
+
+            $id = $ids !== [] ? (int) reset($ids) : 0;
+        } catch (\Throwable) {
+            $id = 0;
+        }
+
+        $this->brandCache[$slug] = $id;
+
+        return $id;
+    }
+
+    /**
+     * Check if an RFP is relevant to IT/web services based on title and description.
+     *
+     * @param array<string, mixed> $rfpData
+     */
+    private function isItRelevant(array $rfpData): bool
+    {
+        $text = strtolower(
+            ($rfpData['label'] ?? '') . ' ' . ($rfpData['title'] ?? '') . ' ' . ($rfpData['description'] ?? '')
+        );
+
+        foreach (self::IT_RELEVANCE_KEYWORDS as $keyword) {
+            if (str_contains($text, $keyword)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
