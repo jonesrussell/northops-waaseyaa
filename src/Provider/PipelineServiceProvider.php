@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Provider;
 
+use App\Command\DecayScoresCommand;
 use App\Command\ImportRfpsCommand;
 use App\Command\OutreachListCommand;
 use App\Command\ScoreLeadsCommand;
@@ -81,6 +82,7 @@ final class PipelineServiceProvider extends ServiceProvider
             new ImportRfpsCommand($rfpImportService, $defaultBrandId),
             new ScoreLeadsCommand($entityTypeManager, $scoringService),
             new OutreachListCommand($entityTypeManager, $outreachRenderer),
+            new DecayScoresCommand($entityTypeManager),
         ];
     }
 
