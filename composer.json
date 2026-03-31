@@ -73,8 +73,8 @@
     "extra": {
         "waaseyaa": {
             "providers": [
+                "Waaseyaa\\Mail\\MailServiceProvider",
                 "App\\Provider\\AppServiceProvider",
-                "App\\Provider\\AuthServiceProvider",
                 "App\\Provider\\PipelineServiceProvider"
             ]
         }
