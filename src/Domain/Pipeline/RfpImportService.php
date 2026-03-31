@@ -173,6 +173,8 @@ final class RfpImportService
      */
     private function mapHitToRfpData(array $hit): array
     {
+        $rfp = $hit['rfp'] ?? [];
+
         $categories = $hit['topics'] ?? [];
         $sector = null;
         if (is_array($categories) && $categories !== []) {
@@ -182,15 +184,15 @@ final class RfpImportService
         return [
             'external_id' => $hit['id'] ?? '',
             'label' => $hit['title'] ?? 'RFP Import',
-            'source_url' => $hit['canonical_url'] ?? $hit['source'] ?? $hit['url'] ?? '',
-            'company_name' => $hit['organization_name'] ?? '',
-            'closing_date' => $hit['closing_date'] ?? '',
+            'source_url' => $rfp['source_url'] ?? $hit['url'] ?? '',
+            'company_name' => $rfp['organization_name'] ?? '',
+            'closing_date' => $rfp['closing_date'] ?? '',
             'description' => $hit['body'] ?? $hit['raw_text'] ?? '',
             'sector' => $sector,
             'qualify_rating' => $hit['quality_score'] ?? null,
-            'contact_name' => $hit['contact_name'] ?? '',
-            'contact_email' => $hit['contact_email'] ?? '',
-            'value' => $hit['budget_max'] ?? '',
+            'contact_name' => $rfp['contact_name'] ?? '',
+            'contact_email' => $rfp['contact_email'] ?? '',
+            'value' => $rfp['budget_max'] ?? '',
         ];
     }
 }

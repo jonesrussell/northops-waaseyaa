@@ -28,7 +28,8 @@ final class ImportRfpsCommand extends Command
     {
         $this
             ->addOption('days', 'd', InputOption::VALUE_REQUIRED, 'Lookback window in days', '7')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show what would be imported without persisting');
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show what would be imported without persisting')
+            ->addOption('auto-qualify', null, InputOption::VALUE_NONE, 'Run AI qualification on each imported lead');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -40,22 +41,31 @@ final class ImportRfpsCommand extends Command
         }
 
         $dryRun = (bool) $input->getOption('dry-run');
+        $autoQualify = (bool) $input->getOption('auto-qualify');
 
         if ($dryRun) {
             $output->writeln('<comment>DRY RUN — no leads will be created.</comment>');
         }
 
+        if ($autoQualify && !$dryRun) {
+            $output->writeln('<info>Auto-qualification enabled — each imported lead will be scored via Claude API.</info>');
+        }
+
         $output->writeln("Importing RFPs from the last {$days} days...");
 
         try {
-            $stats = $this->rfpImportService->import($this->defaultBrandId, $days, $dryRun);
+            $stats = $this->rfpImportService->import($this->defaultBrandId, $days, $dryRun, $autoQualify);
         } catch (\Throwable $e) {
             $output->writeln("<error>Import failed: {$e->getMessage()}</error>");
             return Command::FAILURE;
         }
 
         $output->writeln("  <info>Imported:</info> {$stats['imported']}");
-        $output->writeln("  <comment>Skipped (duplicates):</comment> {$stats['skipped']}");
+        $output->writeln("  <comment>Skipped:</comment> {$stats['skipped']}");
+
+        if ($autoQualify) {
+            $output->writeln("  <info>Qualified:</info> {$stats['qualified']}");
+        }
 
         if ($stats['errors'] > 0) {
             $output->writeln("  <error>Errors:</error> {$stats['errors']}");
