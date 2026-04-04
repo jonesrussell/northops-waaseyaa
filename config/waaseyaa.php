@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 return [
+    // Application URL used by UserServiceProvider and other subsystems.
+    'app' => [
+        'url' => getenv('APP_URL') ?: 'http://localhost:8080',
+    ],
+
     // SQLite database path. Null means "resolve in kernel":
     // WAASEYAA_DB env var -> {projectRoot}/waaseyaa.sqlite fallback.
     // Set an explicit path here to override both.
