@@ -75,7 +75,8 @@
             "providers": [
                 "Waaseyaa\\Mail\\MailServiceProvider",
                 "App\\Provider\\AppServiceProvider",
-                "App\\Provider\\PipelineServiceProvider"
+                "App\\Provider\\PipelineServiceProvider",
+                "App\\Provider\\SignalServiceProvider"
             ]
         }
     },
