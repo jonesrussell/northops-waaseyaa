@@ -9,7 +9,7 @@ use App\Entity\ContactSubmission;
 use App\Entity\Lead;
 use Waaseyaa\Entity\EntityTypeManager;
 
-final class LeadFactory
+final class LeadFactory implements LeadFactoryInterface
 {
     /**
      * Keywords that indicate an RFP is relevant to IT/web services.

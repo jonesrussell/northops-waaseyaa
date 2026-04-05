@@ -7,7 +7,7 @@ namespace App\Domain\Signal;
 use App\Entity\Lead;
 use Waaseyaa\Entity\EntityTypeManager;
 
-final class SignalMatcher
+final class SignalMatcher implements SignalMatcherInterface
 {
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
