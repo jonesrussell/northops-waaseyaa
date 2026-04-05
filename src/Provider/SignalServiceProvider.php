@@ -19,7 +19,6 @@ use App\Domain\Signal\SignalIngestionService;
 use App\Domain\Signal\SignalMatcher;
 use App\Support\DiscordNotifier;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\HttpClient\StreamHttpClient;
@@ -140,7 +139,7 @@ final class SignalServiceProvider extends ServiceProvider
         $router->addRoute(
             'api.signals.ingest',
             RouteBuilder::create('/api/signals')
-                ->controller(fn () => $this->signalController()->ingest(Request::createFromGlobals()))
+                ->controller(fn ($request) => $this->signalController()->ingest($request))
                 ->allowAll()
                 ->methods('POST')
                 ->build(),
@@ -149,7 +148,7 @@ final class SignalServiceProvider extends ServiceProvider
         $router->addRoute(
             'api.signals.unmatched',
             RouteBuilder::create('/api/signals/unmatched')
-                ->controller(fn () => $this->signalController()->listUnmatched(Request::createFromGlobals()))
+                ->controller(fn ($request) => $this->signalController()->listUnmatched($request))
                 ->requireAuthentication()
                 ->methods('GET')
                 ->build(),

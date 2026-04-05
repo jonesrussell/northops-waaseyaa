@@ -54,8 +54,12 @@ final class SignalMatcher implements SignalMatcherInterface
             return null;
         }
 
+        // Extract the first word for a LIKE pre-filter to avoid full table scan
+        $firstWord = explode(' ', $normalizedInput)[0];
         $storage = $this->entityTypeManager->getStorage('lead');
-        $ids = $storage->getQuery()->execute();
+        $ids = $storage->getQuery()
+            ->condition('company_name', "%{$firstWord}%", 'LIKE')
+            ->execute();
 
         foreach ($ids as $id) {
             $lead = $storage->load((int) $id);

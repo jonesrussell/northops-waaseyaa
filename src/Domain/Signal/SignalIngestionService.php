@@ -47,24 +47,24 @@ final class SignalIngestionService
                 continue;
             }
 
-            $signal = $this->createSignal($signalData);
+            $signal = $this->buildSignal($signalData);
             $lead = $this->signalMatcher->match($signalData);
 
             if ($lead !== null) {
                 $signal->set('lead_id', $lead->id());
-                $this->entityTypeManager->getStorage('lead_signal')->save($signal);
                 $leadsMatched++;
             } else {
                 $strength = (int) ($signalData['strength'] ?? 50);
                 if ($strength >= $this->autoCreateThreshold) {
                     $lead = $this->leadFactory->fromSignal($signalData, $this->defaultBrandId);
                     $signal->set('lead_id', $lead->id());
-                    $this->entityTypeManager->getStorage('lead_signal')->save($signal);
                     $leadsCreated++;
                 } else {
                     $unmatched++;
                 }
             }
+
+            $this->entityTypeManager->getStorage('lead_signal')->save($signal);
 
             $this->dispatcher->dispatch(new SignalIngestedEvent($signal, $lead));
             $ingested++;
@@ -99,9 +99,9 @@ final class SignalIngestionService
         return $ids !== [];
     }
 
-    private function createSignal(array $data): LeadSignal
+    private function buildSignal(array $data): LeadSignal
     {
-        $signal = new LeadSignal([
+        return new LeadSignal([
             'label' => $data['label'],
             'signal_type' => $data['signal_type'],
             'source' => $data['source'],
@@ -114,9 +114,5 @@ final class SignalIngestionService
             'province' => $data['province'] ?? '',
             'expires_at' => $data['expires_at'] ?? null,
         ]);
-
-        $this->entityTypeManager->getStorage('lead_signal')->save($signal);
-
-        return $signal;
     }
 }
