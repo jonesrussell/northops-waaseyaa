@@ -111,6 +111,40 @@ final class LeadFactory
     }
 
     /**
+     * Create a lead from a signal (RFP, funding win, job posting, etc.).
+     *
+     * @param array<string, mixed> $signalData
+     */
+    public function fromSignal(array $signalData, int $brandId): Lead
+    {
+        $sourceMap = [
+            'rfp' => 'rfp',
+            'funding_win' => 'referral',
+            'job_posting' => 'cold_outreach',
+            'tech_migration' => 'cold_outreach',
+            'outdated_website' => 'cold_outreach',
+            'new_program' => 'other',
+            'hn_mention' => 'other',
+        ];
+
+        $signalType = $signalData['signal_type'] ?? '';
+        $source = $sourceMap[$signalType] ?? 'other';
+
+        $data = [
+            'label' => $signalData['label'] ?? '',
+            'company_name' => $signalData['organization_name'] ?? '',
+            'source_url' => $signalData['source_url'] ?? '',
+            'external_id' => $signalData['external_id'] ?? '',
+            'sector' => $signalData['sector'] ?? '',
+            'source' => $source,
+            'brand_id' => $brandId,
+            'stage' => 'lead',
+        ];
+
+        return $this->leadManager->create($data);
+    }
+
+    /**
      * Run routing rules and enrich lead data with brand assignment and confidence.
      *
      * @param array<string, mixed> $data
