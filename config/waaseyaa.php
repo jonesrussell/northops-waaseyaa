@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 return [
+    // Application URL used by UserServiceProvider and other subsystems.
+    'app' => [
+        'url' => getenv('APP_URL') ?: 'http://localhost:8080',
+    ],
+
     // SQLite database path. Null means "resolve in kernel":
     // WAASEYAA_DB env var -> {projectRoot}/waaseyaa.sqlite fallback.
     // Set an explicit path here to override both.
@@ -63,6 +68,8 @@ return [
         'company_profile' => getenv('COMPANY_PROFILE') ?: 'NorthOps — DevOps, CI/CD, AI Engineering, Web Application Engineering',
         'default_brand' => 'northops',
         'api_key' => getenv('PIPELINE_API_KEY') ?: '',
+        'signal_auto_create_threshold' => (int) (getenv('SIGNAL_AUTO_CREATE_THRESHOLD') ?: 50),
+        'signal_auto_enrich' => filter_var(getenv('SIGNAL_AUTO_ENRICH') ?: true, FILTER_VALIDATE_BOOLEAN),
     ],
 
     // SSR theme id discovered from Composer package metadata.

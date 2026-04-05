@@ -9,7 +9,7 @@ use App\Entity\ContactSubmission;
 use App\Entity\Lead;
 use Waaseyaa\Entity\EntityTypeManager;
 
-final class LeadFactory
+final class LeadFactory implements LeadFactoryInterface
 {
     /**
      * Keywords that indicate an RFP is relevant to IT/web services.
@@ -108,6 +108,40 @@ final class LeadFactory
     public function fromManualEntry(array $data): Lead
     {
         return $this->leadManager->create($this->applyRouting($data));
+    }
+
+    /**
+     * Create a lead from a signal (RFP, funding win, job posting, etc.).
+     *
+     * @param array<string, mixed> $signalData
+     */
+    public function fromSignal(array $signalData, int $brandId): Lead
+    {
+        $sourceMap = [
+            'rfp' => 'rfp',
+            'funding_win' => 'referral',
+            'job_posting' => 'cold_outreach',
+            'tech_migration' => 'cold_outreach',
+            'outdated_website' => 'cold_outreach',
+            'new_program' => 'other',
+            'hn_mention' => 'other',
+        ];
+
+        $signalType = $signalData['signal_type'] ?? '';
+        $source = $sourceMap[$signalType] ?? 'other';
+
+        $data = [
+            'label' => $signalData['label'] ?? '',
+            'company_name' => $signalData['organization_name'] ?? '',
+            'source_url' => $signalData['source_url'] ?? '',
+            'external_id' => $signalData['external_id'] ?? '',
+            'sector' => $signalData['sector'] ?? '',
+            'source' => $source,
+            'brand_id' => $brandId,
+            'stage' => 'lead',
+        ];
+
+        return $this->leadManager->create($data);
     }
 
     /**
