@@ -104,4 +104,11 @@ return [
         class: \App\Entity\LeadSignal::class,
         keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label'],
     ),
+    new \Waaseyaa\Entity\EntityType(
+        id: 'lead_enrichment',
+        label: 'Lead Enrichment',
+        description: 'Enrichment data from external providers attached to leads',
+        class: \App\Entity\LeadEnrichment::class,
+        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label'],
+    ),
 ];
