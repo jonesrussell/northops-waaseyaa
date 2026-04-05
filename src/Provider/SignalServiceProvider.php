@@ -158,7 +158,7 @@ final class SignalServiceProvider extends ServiceProvider
         $router->addRoute(
             'api.leads.enrich.request',
             RouteBuilder::create('/api/leads/{id}/enrich')
-                ->controller(fn (string $id) => $this->enrichmentController()->requestEnrichment(Request::createFromGlobals(), $id))
+                ->controller(fn ($request, string $id) => $this->enrichmentController()->requestEnrichment($request, $id))
                 ->requireAuthentication()
                 ->methods('POST')
                 ->build(),
@@ -167,7 +167,7 @@ final class SignalServiceProvider extends ServiceProvider
         $router->addRoute(
             'api.leads.enrich.receive',
             RouteBuilder::create('/api/leads/{id}/enrichment')
-                ->controller(fn (string $id) => $this->enrichmentController()->receiveEnrichment(Request::createFromGlobals(), $id))
+                ->controller(fn ($request, string $id) => $this->enrichmentController()->receiveEnrichment($request, $id))
                 ->allowAll()
                 ->methods('POST')
                 ->build(),
@@ -176,7 +176,7 @@ final class SignalServiceProvider extends ServiceProvider
         $router->addRoute(
             'api.leads.signals.list',
             RouteBuilder::create('/api/leads/{id}/signals')
-                ->controller(fn (string $id) => $this->enrichmentController()->listSignals($id))
+                ->controller(fn ($request, string $id) => $this->enrichmentController()->listSignals($id))
                 ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
@@ -185,7 +185,7 @@ final class SignalServiceProvider extends ServiceProvider
         $router->addRoute(
             'api.leads.enrichments.list',
             RouteBuilder::create('/api/leads/{id}/enrichments')
-                ->controller(fn (string $id) => $this->enrichmentController()->listEnrichments($id))
+                ->controller(fn ($request, string $id) => $this->enrichmentController()->listEnrichments($id))
                 ->requireAuthentication()
                 ->methods('GET')
                 ->build(),
