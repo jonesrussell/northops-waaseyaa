@@ -97,4 +97,11 @@ return [
         class: \App\Entity\Outreach::class,
         keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'subject'],
     ),
+    new \Waaseyaa\Entity\EntityType(
+        id: 'lead_signal',
+        label: 'Lead Signal',
+        description: 'Signals from crawlers and external sources that may indicate lead intent',
+        class: \App\Entity\LeadSignal::class,
+        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label'],
+    ),
 ];
