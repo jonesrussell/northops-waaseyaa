@@ -101,8 +101,9 @@ final class MarketingController
 
         try {
             $this->leadFactory->fromContactSubmission($submission, $this->defaultBrandId);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
             // Lead creation is non-blocking — contact form submission succeeds regardless
+            error_log(sprintf('[NorthOps] Lead auto-creation failed: %s in %s:%d', $e->getMessage(), $e->getFile(), $e->getLine()));
         }
     }
 
