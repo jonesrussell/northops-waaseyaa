@@ -9,7 +9,7 @@ use App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber;
 use App\Entity\Lead;
 use Waaseyaa\Entity\EntityTypeManager;
 
-final class LeadManager
+final class LeadManager implements LeadManagerInterface
 {
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,

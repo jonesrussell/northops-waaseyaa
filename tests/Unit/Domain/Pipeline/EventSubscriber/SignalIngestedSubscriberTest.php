@@ -6,6 +6,7 @@ namespace Tests\Unit\Domain\Pipeline\EventSubscriber;
 
 use App\Domain\Pipeline\EventSubscriber\QualificationHandlerInterface;
 use App\Domain\Pipeline\EventSubscriber\SignalIngestedSubscriber;
+use App\Domain\Pipeline\LeadManagerInterface;
 use App\Domain\Qualification\QualifierInterface;
 use App\Domain\Signal\Event\SignalIngestedEvent;
 use App\Entity\Lead;
@@ -97,24 +98,24 @@ final class SignalIngestedSubscriberTest extends TestCase
 
         $notifier = $this->createMock(NotifierInterface::class);
 
-        $activityStorage = $this->createMock(EntityStorageInterface::class);
-        $leadStorage = $this->createMock(EntityStorageInterface::class);
-        $leadStorage->expects($this->once())->method('save');
+        $lead = $this->createLead();
 
+        $leadManager = $this->createMock(LeadManagerInterface::class);
+        $leadManager->expects($this->once())->method('update')->willReturn($lead);
+
+        $activityStorage = $this->createMock(EntityStorageInterface::class);
         $etm = $this->createMock(EntityTypeManager::class);
-        $etm->method('getStorage')->willReturnMap([
-            ['lead_activity', $activityStorage],
-            ['lead', $leadStorage],
-        ]);
+        $etm->method('getStorage')->willReturn($activityStorage);
 
         $subscriber = new SignalIngestedSubscriber(
             $etm,
             $notifier,
             $qualService,
             $qualSubscriber,
+            $leadManager,
             autoQualify: true,
         );
-        $subscriber(new SignalIngestedEvent($this->createSignal(), $this->createLead()));
+        $subscriber(new SignalIngestedEvent($this->createSignal(), $lead));
     }
 
     public function testAutoQualifyDisabledSkipsQualification(): void
@@ -153,11 +154,14 @@ final class SignalIngestedSubscriberTest extends TestCase
         $etm = $this->createMock(EntityTypeManager::class);
         $etm->method('getStorage')->willReturn($activityStorage);
 
+        $leadManager = $this->createMock(LeadManagerInterface::class);
+
         $subscriber = new SignalIngestedSubscriber(
             $etm,
             $notifier,
             $qualService,
             $qualSubscriber,
+            $leadManager,
             autoQualify: true,
         );
         $subscriber(new SignalIngestedEvent($this->createSignal(), $this->createLead()));

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Pipeline\EventSubscriber;
 
+use App\Domain\Pipeline\LeadManagerInterface;
 use App\Domain\Qualification\QualifierInterface;
 use App\Domain\Signal\Event\SignalIngestedEvent;
 use App\Entity\Lead;
@@ -18,6 +19,7 @@ final class SignalIngestedSubscriber
         private readonly NotifierInterface $notifier,
         private readonly ?QualifierInterface $qualificationService = null,
         private readonly ?QualificationHandlerInterface $qualifiedSubscriber = null,
+        private readonly ?LeadManagerInterface $leadManager = null,
         private readonly bool $autoQualify = false,
     ) {}
 
@@ -66,17 +68,23 @@ final class SignalIngestedSubscriber
 
     private function maybeAutoQualify(Lead $lead): void
     {
-        if (!$this->autoQualify || $this->qualificationService === null || $this->qualifiedSubscriber === null) {
+        if (!$this->autoQualify || $this->qualificationService === null || $this->qualifiedSubscriber === null || $this->leadManager === null) {
             return;
         }
 
         try {
             $result = $this->qualificationService->qualify($lead);
 
-            $lead->set('qualification_rating', $result['rating']);
-            $lead->set('qualification_score', $result['score']);
-            $lead->set('sector', $result['sector'] ?? '');
-            $this->entityTypeManager->getStorage('lead')->save($lead);
+            $this->leadManager->update($lead, [
+                'qualify_rating' => $result['rating'],
+                'qualify_confidence' => $result['confidence'],
+                'qualify_keywords' => json_encode($result['keywords'], JSON_THROW_ON_ERROR),
+                'qualify_notes' => $result['summary'] ?? '',
+                'qualify_raw' => $result['raw'],
+                'sector' => $result['sector'] ?? $lead->getSector(),
+                'score' => $result['score'],
+                'recommended_brand' => $result['recommended_brand'],
+            ]);
 
             $this->qualifiedSubscriber->handle($lead, $result);
         } catch (\Throwable $e) {

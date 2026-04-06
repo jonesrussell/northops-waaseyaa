@@ -58,6 +58,12 @@ final class SignalServiceProvider extends ServiceProvider
             $etm = $this->resolve(EntityTypeManager::class);
             $dispatcher = $this->resolve(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class);
 
+            $leadManager = new LeadManager(
+                $etm,
+                new \App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber($etm, $this->getDiscordNotifier()),
+                new \App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber($etm, $this->getDiscordNotifier()),
+            );
+
             if ($dispatcher instanceof EventDispatcherInterface) {
                 $autoQualify = filter_var($this->config['pipeline']['signal_auto_enrich'] ?? false, FILTER_VALIDATE_BOOLEAN);
                 $qualificationService = null;
@@ -81,16 +87,11 @@ final class SignalServiceProvider extends ServiceProvider
                     $this->getDiscordNotifier(),
                     $qualificationService,
                     $qualifiedSubscriber,
+                    $leadManager,
                     $autoQualify,
                 );
                 $dispatcher->addListener(SignalIngestedEvent::class, $signalSubscriber);
             }
-
-            $leadManager = new LeadManager(
-                $etm,
-                new \App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber($etm, $this->getDiscordNotifier()),
-                new \App\Domain\Pipeline\EventSubscriber\StageChangedSubscriber($etm, $this->getDiscordNotifier()),
-            );
 
             $leadFactory = new LeadFactory($leadManager, $etm, new RoutingService());
 
