@@ -42,19 +42,23 @@ final class QualifyLeadsCommand extends Command
         $dryRun = (bool) $input->getOption('dry-run');
 
         $storage = $this->entityTypeManager->getStorage('lead');
-        $ids = $storage->getQuery()
-            ->condition('qualify_rating', null)
-            ->execute();
+        $allIds = $storage->getQuery()->execute();
 
-        $total = count($ids);
+        // Filter to leads missing qualify_rating (entity query can't match absent JSON fields).
+        $unqualifiedLeads = [];
+        foreach ($allIds as $id) {
+            $lead = $storage->load((int) $id);
+            if ($lead instanceof Lead && ($lead->get('qualify_rating') === null || $lead->get('qualify_rating') === '')) {
+                $unqualifiedLeads[] = $lead;
+            }
+        }
+
+        $total = count($unqualifiedLeads);
         $output->writeln(sprintf('Found %d unqualified leads (processing up to %d)', $total, $limit));
 
         if ($dryRun) {
-            foreach (array_slice($ids, 0, $limit) as $id) {
-                $lead = $storage->load((int) $id);
-                if ($lead instanceof Lead) {
-                    $output->writeln(sprintf('  [%d] %s', $lead->id(), $lead->getLabel()));
-                }
+            foreach (array_slice($unqualifiedLeads, 0, $limit) as $lead) {
+                $output->writeln(sprintf('  [%d] %s', $lead->id(), $lead->getLabel()));
             }
             return Command::SUCCESS;
         }
@@ -62,12 +66,7 @@ final class QualifyLeadsCommand extends Command
         $qualified = 0;
         $errors = 0;
 
-        foreach (array_slice($ids, 0, $limit) as $id) {
-            $lead = $storage->load((int) $id);
-            if (!$lead instanceof Lead) {
-                continue;
-            }
-
+        foreach (array_slice($unqualifiedLeads, 0, $limit) as $lead) {
             try {
                 $result = $this->qualificationService->qualify($lead);
 
