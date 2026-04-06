@@ -9,7 +9,7 @@ use Psr\Log\NullLogger;
 use Waaseyaa\HttpClient\HttpClientInterface;
 use Waaseyaa\HttpClient\HttpRequestException;
 
-final class DiscordNotifier
+final class DiscordNotifier implements NotifierInterface
 {
     public function __construct(
         private readonly HttpClientInterface $httpClient,

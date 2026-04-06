@@ -10,10 +10,14 @@ use App\Domain\Enrichment\EnrichmentReceiver;
 use App\Domain\Enrichment\EnrichmentService;
 use App\Domain\Enrichment\Event\LeadEnrichedEvent;
 use App\Domain\Pipeline\EventSubscriber\LeadEnrichedSubscriber;
+use App\Domain\Pipeline\EventSubscriber\LeadQualifiedSubscriber;
 use App\Domain\Pipeline\EventSubscriber\SignalIngestedSubscriber;
 use App\Domain\Pipeline\LeadFactory;
 use App\Domain\Pipeline\LeadManager;
+use App\Domain\Pipeline\ProspectScoringService;
 use App\Domain\Pipeline\RoutingService;
+use App\Domain\Qualification\CompanyProfile;
+use App\Domain\Qualification\QualificationService;
 use App\Domain\Signal\Event\SignalIngestedEvent;
 use App\Domain\Signal\SignalIngestionService;
 use App\Domain\Signal\SignalMatcher;
@@ -55,7 +59,30 @@ final class SignalServiceProvider extends ServiceProvider
             $dispatcher = $this->resolve(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class);
 
             if ($dispatcher instanceof EventDispatcherInterface) {
-                $signalSubscriber = new SignalIngestedSubscriber($etm, $this->getDiscordNotifier());
+                $autoQualify = filter_var($this->config['pipeline']['signal_auto_enrich'] ?? false, FILTER_VALIDATE_BOOLEAN);
+                $qualificationService = null;
+                $qualifiedSubscriber = null;
+
+                if ($autoQualify) {
+                    $apiKey = $this->config['pipeline']['anthropic_api_key'] ?? '';
+                    if ($apiKey !== '') {
+                        $qualificationService = new QualificationService(
+                            new StreamHttpClient(),
+                            $apiKey,
+                            new CompanyProfile($this->config['pipeline']['company_profile'] ?? ''),
+                            new ProspectScoringService(),
+                        );
+                        $qualifiedSubscriber = new LeadQualifiedSubscriber($etm, $this->getDiscordNotifier());
+                    }
+                }
+
+                $signalSubscriber = new SignalIngestedSubscriber(
+                    $etm,
+                    $this->getDiscordNotifier(),
+                    $qualificationService,
+                    $qualifiedSubscriber,
+                    $autoQualify,
+                );
                 $dispatcher->addListener(SignalIngestedEvent::class, $signalSubscriber);
             }
 

@@ -9,7 +9,7 @@ use App\Entity\LeadActivity;
 use App\Support\DiscordNotifier;
 use Waaseyaa\Entity\EntityTypeManager;
 
-final class LeadQualifiedSubscriber
+final class LeadQualifiedSubscriber implements QualificationHandlerInterface
 {
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,

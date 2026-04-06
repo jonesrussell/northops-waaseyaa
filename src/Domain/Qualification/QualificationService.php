@@ -9,7 +9,7 @@ use App\Entity\Lead;
 use Waaseyaa\HttpClient\HttpClientInterface;
 use Waaseyaa\HttpClient\HttpRequestException;
 
-final class QualificationService
+final class QualificationService implements QualifierInterface
 {
     public function __construct(
         private readonly HttpClientInterface $httpClient,
