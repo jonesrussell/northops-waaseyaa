@@ -34,12 +34,14 @@ final class QualifyLeadsCommand extends Command
     {
         $this->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Max leads to qualify', '50');
         $this->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show what would be qualified without calling the API');
+        $this->addOption('force', null, InputOption::VALUE_NONE, 'Re-qualify all leads, even already-qualified ones');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit = (int) $input->getOption('limit');
         $dryRun = (bool) $input->getOption('dry-run');
+        $force = (bool) $input->getOption('force');
 
         $storage = $this->entityTypeManager->getStorage('lead');
         $allIds = $storage->getQuery()->execute();
@@ -48,7 +50,10 @@ final class QualifyLeadsCommand extends Command
         $unqualifiedLeads = [];
         foreach ($allIds as $id) {
             $lead = $storage->load((int) $id);
-            if ($lead instanceof Lead && ($lead->get('qualify_rating') === null || $lead->get('qualify_rating') === '')) {
+            if (!$lead instanceof Lead) {
+                continue;
+            }
+            if ($force || $lead->get('qualify_rating') === null || $lead->get('qualify_rating') === '') {
                 $unqualifiedLeads[] = $lead;
             }
         }
