@@ -75,7 +75,7 @@ final class SignalIngestedSubscriber
         try {
             $result = $this->qualificationService->qualify($lead);
 
-            $this->leadManager->update($lead, [
+            $updateData = [
                 'qualify_rating' => $result['rating'],
                 'qualify_confidence' => $result['confidence'],
                 'qualify_keywords' => json_encode($result['keywords'], JSON_THROW_ON_ERROR),
@@ -84,7 +84,14 @@ final class SignalIngestedSubscriber
                 'sector' => $result['sector'] ?? $lead->getSector(),
                 'score' => $result['score'],
                 'recommended_brand' => $result['recommended_brand'],
-            ]);
+            ];
+
+            $brandId = $this->resolveBrandId($result['recommended_brand']);
+            if ($brandId !== null) {
+                $updateData['brand_id'] = $brandId;
+            }
+
+            $this->leadManager->update($lead, $updateData);
 
             $this->qualifiedSubscriber->handle($lead, $result);
         } catch (\Throwable $e) {
@@ -98,5 +105,19 @@ final class SignalIngestedSubscriber
                 'timestamp' => date('c'),
             ]);
         }
+    }
+
+    private function resolveBrandId(string $slug): ?int
+    {
+        if ($slug === '') {
+            return null;
+        }
+
+        $ids = $this->entityTypeManager->getStorage('brand')
+            ->getQuery()
+            ->condition('slug', $slug)
+            ->execute();
+
+        return $ids !== [] ? (int) reset($ids) : null;
     }
 }

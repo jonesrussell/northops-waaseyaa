@@ -54,7 +54,8 @@ final class LeadManager implements LeadManagerInterface
             'company_name', 'value', 'finder_fee_percent', 'closing_date',
             'assigned_to', 'sector', 'source_url', 'external_id',
             'qualify_rating', 'qualify_confidence', 'qualify_keywords',
-            'qualify_notes', 'qualify_raw',
+            'qualify_notes', 'qualify_raw', 'score', 'recommended_brand',
+            'brand_id', 'tier',
             'draft_email_subject', 'draft_email_body', 'draft_pdf_markdown',
         ];
 
