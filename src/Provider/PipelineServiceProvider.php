@@ -7,6 +7,7 @@ namespace App\Provider;
 use App\Command\DecayScoresCommand;
 use App\Command\ImportRfpsCommand;
 use App\Command\OutreachListCommand;
+use App\Command\QualifyLeadsCommand;
 use App\Command\ScoreLeadsCommand;
 use App\Command\SeedBrandsCommand;
 use App\Domain\Pipeline\EventSubscriber\LeadCreatedSubscriber;
@@ -83,6 +84,7 @@ final class PipelineServiceProvider extends ServiceProvider
             new ScoreLeadsCommand($entityTypeManager, $scoringService),
             new OutreachListCommand($entityTypeManager, $outreachRenderer),
             new DecayScoresCommand($entityTypeManager),
+            new QualifyLeadsCommand($entityTypeManager, $qualificationService, $leadManager, $leadQualifiedSubscriber),
         ];
     }
 
