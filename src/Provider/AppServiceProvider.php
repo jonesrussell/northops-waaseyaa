@@ -300,6 +300,15 @@ final class AppServiceProvider extends ServiceProvider
         );
 
         $router->addRoute(
+            'admin.lead.pipeline',
+            RouteBuilder::create('/admin/lead/pipeline')
+                ->controller(fn () => $this->dashboardController()->index())
+                ->requireAuthentication()
+                ->methods('GET')
+                ->build(),
+        );
+
+        $router->addRoute(
             'admin.leads',
             RouteBuilder::create('/admin/leads')
                 ->controller(fn () => $this->dashboardController()->leadList())

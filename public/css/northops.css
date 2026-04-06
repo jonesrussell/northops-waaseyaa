@@ -318,6 +318,24 @@ li {
     padding: var(--space-2) var(--space-5);
 }
 
+/* Admin header */
+.admin-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--color-text);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.admin-header .header-inner { height: 3.5rem; }
+.admin-header .wordmark { color: #fff; }
+.admin-header .wordmark:hover { color: #fff; }
+.admin-header .header-nav > a { color: rgba(255,255,255,0.7); font-size: var(--text-sm); font-weight: var(--font-medium); text-decoration: none; }
+.admin-header .header-nav > a:hover { color: #fff; }
+.admin-badge { font-size: var(--text-xs); color: var(--color-accent); margin-left: var(--space-1); }
+.btn-text { font-size: var(--text-xs) !important; opacity: 0.5; }
+.btn-text:hover { opacity: 1; }
+
 /* ------------------------------------------------------------
    5. HERO
    ------------------------------------------------------------ */

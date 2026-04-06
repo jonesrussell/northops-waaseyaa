@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Admin — NorthOps{% endblock %}</title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/northops.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <div class="container header-inner">
+            <a href="/admin" class="wordmark">NorthOps <span class="admin-badge">Admin</span></a>
+            <nav class="header-nav">
+                <a href="/admin/lead/pipeline">Pipeline</a>
+                <a href="/admin/leads">Leads</a>
+                <a href="/admin/settings">Settings</a>
+                <a href="/" class="btn-text">View Site</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
