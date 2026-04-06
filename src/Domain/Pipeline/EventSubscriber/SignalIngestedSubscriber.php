@@ -113,6 +113,10 @@ final class SignalIngestedSubscriber
             return null;
         }
 
+        // Alias scoring service slugs to seeded brand slugs.
+        $aliases = ['webnet' => 'web-networks'];
+        $slug = $aliases[$slug] ?? $slug;
+
         $ids = $this->entityTypeManager->getStorage('brand')
             ->getQuery()
             ->condition('slug', $slug)
