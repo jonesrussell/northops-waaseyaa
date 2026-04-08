@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Provider;
 
+use App\Command\MineNorthCloudContentCommand;
 use App\Controller\Api\EnrichmentController;
 use App\Controller\Api\SignalController;
 use App\Domain\Enrichment\EnrichmentReceiver;
@@ -39,6 +40,20 @@ final class SignalServiceProvider extends ServiceProvider
     private ?EnrichmentReceiver $enrichmentReceiver = null;
 
     public function register(): void {}
+
+    // ---------------------------------------------------------------
+    // Commands
+    // ---------------------------------------------------------------
+
+    public function commands(
+        \Waaseyaa\Entity\EntityTypeManager $entityTypeManager,
+        \Waaseyaa\Database\DatabaseInterface $database,
+        \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher,
+    ): array {
+        return [
+            new MineNorthCloudContentCommand(),
+        ];
+    }
 
     // ---------------------------------------------------------------
     // Shared service builders (lazy, cached)
