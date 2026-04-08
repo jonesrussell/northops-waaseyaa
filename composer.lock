@@ -5237,16 +5237,16 @@
         },
         {
             "name": "waaseyaa/github",
-            "version": "v0.1.0-alpha.104",
+            "version": "v0.1.0-alpha.110",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/github.git",
-                "reference": "c4004120b522223ee73b2cf36fdc7c370bbeb4ab"
+                "reference": "305cf045ab954c2484b39db7bd00aa12aee2912d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waaseyaa/github/zipball/c4004120b522223ee73b2cf36fdc7c370bbeb4ab",
-                "reference": "c4004120b522223ee73b2cf36fdc7c370bbeb4ab",
+                "url": "https://api.github.com/repos/waaseyaa/github/zipball/305cf045ab954c2484b39db7bd00aa12aee2912d",
+                "reference": "305cf045ab954c2484b39db7bd00aa12aee2912d",
                 "shasum": ""
             },
             "require": {
@@ -5270,9 +5270,9 @@
             "description": "GitHub API client for issues, milestones, and pull requests",
             "support": {
                 "issues": "https://github.com/waaseyaa/github/issues",
-                "source": "https://github.com/waaseyaa/github/tree/v0.1.0-alpha.104"
+                "source": "https://github.com/waaseyaa/github/tree/v0.1.0-alpha.110"
             },
-            "time": "2026-03-23T17:30:12+00:00"
+            "time": "2026-04-08T15:25:48+00:00"
         },
         {
             "name": "waaseyaa/graphql",
