@@ -6262,16 +6262,16 @@
         },
         {
             "name": "waaseyaa/telescope",
-            "version": "v0.1.0-alpha.104",
+            "version": "v0.1.0-alpha.110",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/telescope.git",
-                "reference": "ab374ec4966e759e3a45e986119a281466f0d3c6"
+                "reference": "e1abaeb412a8ad573e182748ad52c393db6f8827"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waaseyaa/telescope/zipball/ab374ec4966e759e3a45e986119a281466f0d3c6",
-                "reference": "ab374ec4966e759e3a45e986119a281466f0d3c6",
+                "url": "https://api.github.com/repos/waaseyaa/telescope/zipball/e1abaeb412a8ad573e182748ad52c393db6f8827",
+                "reference": "e1abaeb412a8ad573e182748ad52c393db6f8827",
                 "shasum": ""
             },
             "require": {
@@ -6299,9 +6299,9 @@
             "description": "Application observability and debugging for Waaseyaa",
             "support": {
                 "issues": "https://github.com/waaseyaa/telescope/issues",
-                "source": "https://github.com/waaseyaa/telescope/tree/v0.1.0-alpha.104"
+                "source": "https://github.com/waaseyaa/telescope/tree/v0.1.0-alpha.110"
             },
-            "time": "2026-04-04T00:46:26+00:00"
+            "time": "2026-04-08T15:25:48+00:00"
         },
         {
             "name": "waaseyaa/testing",
