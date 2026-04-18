@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "840c365af3dbbe1f5b9d43e66e44870b",
+    "content-hash": "8fbbb018fb06e368eb1754a9afbd2ae7",
     "packages": [
         {
             "name": "deployer/deployer",
@@ -4518,6 +4518,45 @@
             "time": "2026-04-03T14:58:04+00:00"
         },
         {
+            "name": "waaseyaa/analytics",
+            "version": "v0.1.0-alpha.147",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/waaseyaa/analytics.git",
+                "reference": "117b41f88d52e490906fbf24b05b3691a68c53a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/waaseyaa/analytics/zipball/117b41f88d52e490906fbf24b05b3691a68c53a9",
+                "reference": "117b41f88d52e490906fbf24b05b3691a68c53a9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "0.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waaseyaa\\Analytics\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Shared Umami analytics integration for Waaseyaa apps — backend sender, JS helpers, and Twig partial.",
+            "support": {
+                "issues": "https://github.com/waaseyaa/analytics/issues",
+                "source": "https://github.com/waaseyaa/analytics/tree/v0.1.0-alpha.147"
+            },
+            "time": "2026-04-13T03:48:09+00:00"
+        },
+        {
             "name": "waaseyaa/api",
             "version": "v0.1.0-alpha.104",
             "source": {
@@ -6629,5 +6668,5 @@
         "php": ">=8.4"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

@@ -52,6 +52,16 @@ final class AppServiceProvider extends ServiceProvider
 
     public function register(): void {}
 
+    public function boot(): void
+    {
+        $twig = SsrServiceProvider::getTwigEnvironment();
+        if ($twig !== null) {
+            $analyticsConfig = $this->config['analytics'] ?? [];
+            $twig->addGlobal('umami_tracker_url', (string) ($analyticsConfig['tracker_url'] ?? ''));
+            $twig->addGlobal('umami_site_id', (string) ($analyticsConfig['site_id'] ?? ''));
+        }
+    }
+
     // ---------------------------------------------------------------
     // Shared service builders (lazy, cached)
     // ---------------------------------------------------------------

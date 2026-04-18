@@ -8,6 +8,7 @@
         "predis/predis": "^2.0",
         "waaseyaa/access": "^0.1",
         "waaseyaa/admin-surface": "^0.1",
+        "waaseyaa/analytics": "^0.1",
         "waaseyaa/ai-agent": "^0.1",
         "waaseyaa/ai-pipeline": "^0.1",
         "waaseyaa/ai-schema": "^0.1",

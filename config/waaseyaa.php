@@ -79,6 +79,12 @@ return [
         'cache_max_age' => (int) (getenv('WAASEYAA_SSR_CACHE_MAX_AGE') ?: 300),
     ],
 
+    // Analytics (Umami). Set UMAMI_TRACKER_URL to empty string to disable locally.
+    'analytics' => [
+        'tracker_url' => getenv('UMAMI_TRACKER_URL') ?: '',
+        'site_id'     => getenv('UMAMI_SITE_ID') ?: '',
+    ],
+
     // AI embedding pipeline configuration.
     'ai' => [
         // 'ollama' or 'openai'. Empty disables embedding generation.
