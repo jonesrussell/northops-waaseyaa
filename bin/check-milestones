@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Drift-check: lists issues without milestones and empty milestones.
+# Output is a warning surface for Claude sessions. Always exits 0.
+
+REPO="jonesrussell/northops-waaseyaa"
+
+echo "=== Milestone Drift Check ==="
+echo ""
+
+# Issues with no milestone
+no_milestone=$(gh api "repos/${REPO}/issues?milestone=none&state=open&per_page=100" --jq 'length' 2>/dev/null)
+if [[ "$no_milestone" -gt 0 ]]; then
+    echo "WARNING: ${no_milestone} open issue(s) with no milestone assigned:"
+    gh api "repos/${REPO}/issues?milestone=none&state=open&per_page=100" --jq '.[] | "  #\(.number) \(.title)"' 2>/dev/null
+    echo ""
+fi
+
+# Milestones with zero open issues
+gh api "repos/${REPO}/milestones?state=open&per_page=100" --jq '.[] | select(.open_issues == 0) | "WARNING: Milestone \"\(.title)\" has 0 open issues (possibly stale)"' 2>/dev/null
+
+echo ""
+echo "=== Done ==="
+exit 0
