@@ -8,3 +8,4 @@
 .env
 .worktrees/
 .phpunit.result.cache
+node_modules/

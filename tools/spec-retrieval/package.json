@@ -1,0 +1,10 @@
+{
+  "name": "northops-spec-retrieval",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MCP server for NorthOps subsystem spec retrieval",
+  "main": "server.js",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}
