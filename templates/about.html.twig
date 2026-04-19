@@ -1,7 +1,7 @@
 {% extends "base.html.twig" %}
 
 {% block title %}About — NorthOps{% endblock %}
-{% block description %}NorthOps is two senior engineers in Northern Ontario delivering fixed-price web apps, pipelines, DevOps, and AI engineering.{% endblock %}
+{% block description %}NorthOps is a boutique AI systems and platform engineering practice in Northern Ontario, led by an Anishinaabe operator from Sagamok First Nation.{% endblock %}
 
 {% block content %}
     <!-- About Text -->
@@ -15,26 +15,22 @@
         <div class="container container-narrow">
             <div class="text-block">
                 <p>
-                    NorthOps started because we kept seeing the same problem: companies that needed senior engineering
-                    work done, whether a web app, a data pipeline, or a deployment system, but couldn't justify a full-time hire
-                    and didn't want to roll the dice on a freelancer or offshore team.
+                    NorthOps is a boutique AI systems architecture and platform engineering practice.
+                    We design and build production systems for scaleups and public-sector teams
+                    adopting AI in earnest — not in prototypes.
                 </p>
                 <p>
-                    We're two senior engineers based in Northern Ontario. Between us we've built content platforms,
-                    e-commerce systems, insurance tech, health data pipelines, and loyalty programs used by hundreds
-                    of thousands of merchants. We've led teams, shipped production systems, and cleaned up the messes
-                    left behind when projects go sideways.
+                    We started NorthOps because the gap between "demo-quality AI" and
+                    "AI that works in production" is wider than most teams expect, and
+                    the people who can close it are scarce. Our work centers on spec-driven
+                    development, multi-agent orchestration, and the deterministic patterns that
+                    keep AI-native systems working six months after they ship.
                 </p>
                 <p>
-                    We started NorthOps to offer something specific: senior-level engineering, fixed-price, delivered
-                    in days. No account managers, no juniors, no layers of overhead. You talk to the engineers who
-                    write the code. We scope tightly, build fast, and hand off clean.
-                </p>
-                <p>
-                    We work from Northern Ontario — Sudbury and Noelville — because that's where we live. The geography
-                    doesn't affect the quality of the work, but it does mean lower overhead, which we pass on as lower
-                    prices. Our MVPs start at CAD $3,600 because we've built these systems enough times to know exactly
-                    what's involved.
+                    We work from Northern Ontario — Sudbury and Noelville — remote-first with
+                    clients across Canada and the public sector. The firm is Indigenous-led:
+                    Russell is Anishinaabe, rooted in Sagamok First Nation, which shapes how we
+                    approach data sovereignty, community stewardship, and Indigenous procurement.
                 </p>
             </div>
         </div>
@@ -48,41 +44,46 @@
                 <div class="team-member">
                     <img src="/images/team/russell-jones.jpg" alt="Russell Jones" class="team-photo">
                     <h3>Russell Jones</h3>
-                    <p class="team-title">Senior Engineer &amp; Co-Founder</p>
+                    <p class="team-title">Principal Engineer &amp; Founder</p>
                     <p>
-                        Russell is a senior full-stack developer with deep experience in content pipelines, automation
-                        systems, and the Laravel/PHP ecosystem. He built North Cloud — a production content intelligence
-                        platform that crawls, classifies, and routes news articles in real time.
+                        Russell leads NorthOps. He focuses on AI systems architecture,
+                        spec-driven development, and the Waaseyaa framework — an entity-first,
+                        AI-native PHP platform that powers production deployments including
+                        OIATC. His practice is organized around codified context, agent-safe
+                        repos, and the patterns that let AI-assisted development scale without
+                        breaking the codebase.
                     </p>
                     <p>
-                        Before NorthOps, Russell spent over a decade building web systems across agencies, startups,
-                        and enterprise clients. He cares deeply about clean code, solid deployment pipelines, and
-                        systems that the next person can actually understand and maintain.
+                        Before NorthOps, Russell spent over a decade building web systems across
+                        agencies, startups, and enterprise clients — content platforms,
+                        e-commerce, and data pipelines that run in production today.
                     </p>
                     <p>
-                        At NorthOps, Russell focuses on backend systems, data pipelines, deployment infrastructure,
-                        and the CI/CD that keeps everything shipping reliably. Based in Sudbury, Ontario.
+                        Russell is Anishinaabe, rooted in Sagamok First Nation. That context
+                        informs the Indigenous Data Sovereignty service line and shapes how the
+                        firm approaches OCAP® principles, community stewardship, and Indigenous
+                        procurement. Based in Sudbury, Ontario.
+                        Public work: <a href="https://jonesrussell.github.io" target="_blank" rel="noopener">jonesrussell.github.io</a>.
                     </p>
                 </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- Collaborators -->
+    <section class="section">
+        <div class="container container-narrow">
+            <h2>Collaborators</h2>
+            <div class="team-grid">
                 <div class="team-member">
                     <img src="/images/team/luc-hebert.jpg" alt="Luc Hebert" class="team-photo">
                     <h3>Luc Hebert</h3>
-                    <p class="team-title">Senior Engineer &amp; Co-Founder</p>
+                    <p class="team-title">Frontend &amp; TypeScript Collaborator</p>
                     <p>
-                        Luc is a senior full-stack software engineer with experience spanning embedded systems,
-                        LMS platforms, insurance tech, and health data systems. Most recently at Smile.io building
-                        loyalty and e-commerce solutions for 100K+ Shopify merchants.
-                    </p>
-                    <p>
-                        From mining vehicle hardware in C to React and Ruby on Rails web stacks, Luc has led teams
-                        and shipped across wildly different domains. He brings a rare combination of hardware-level
-                        thinking and modern web development expertise.
-                    </p>
-                    <p>
-                        At NorthOps, Luc focuses on frontend architecture, TypeScript, and AI integrations.
-                        He builds the interfaces and intelligent features users interact with. Based in
-                        Noelville, Ontario.
+                        Luc collaborates on NorthOps engagements where frontend architecture,
+                        TypeScript, and LLM-powered interface work intersect. He brings senior
+                        full-stack experience across embedded systems, LMS platforms, insurance
+                        tech, and e-commerce at Shopify scale. Based in Noelville, Ontario.
                     </p>
                 </div>
             </div>
@@ -90,17 +91,32 @@
     </section>
 
     <!-- Principles -->
-    <section class="section">
+    <section class="section section-alt">
         <div class="container container-narrow">
             <h2>Principles</h2>
             <ul class="bullet-list">
-                <li>Senior engineers on every project — no juniors, no exceptions.</li>
-                <li>Fixed pricing with clear scope — you know the cost before we start.</li>
-                <li>Ship in days, not weeks — because we've built these systems before.</li>
-                <li>Direct communication — you talk to the people writing the code.</li>
-                <li>Clean handoffs — documented, deployed, and ready for the next person.</li>
-                <li>Honest about fit — if we're not the right team for your project, we'll say so.</li>
-                <li>AI-augmented by default — modern tooling is part of how we work, not an upsell.</li>
+                <li>Senior engineering judgment on every engagement — no juniors, no exceptions.</li>
+                <li>Spec-driven development — the spec is the artifact; the code is an implementation detail.</li>
+                <li>Deterministic over impressive — production systems are measured in months of uptime, not demo quality.</li>
+                <li>Direct communication — you talk to the engineers writing the code.</li>
+                <li>Clean handoffs — documented, deployed, and ready for your team to extend.</li>
+                <li>Honest about fit — if we're not the right firm for your project, we'll say so.</li>
+                <li>Data sovereignty by default — community ownership and consent are design inputs, not afterthoughts.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Trust -->
+    <section class="section">
+        <div class="container container-narrow">
+            <h2>Firm details</h2>
+            <ul class="bullet-list">
+                <li>HST-registered Ontario sole proprietorship.</li>
+                <li>Northern Ontario, Canada — remote-first.</li>
+                <li>Indigenous-led — Anishinaabe, Sagamok First Nation.</li>
+                <li>Framework: <a href="https://github.com/waaseyaa" target="_blank" rel="noopener">github.com/waaseyaa</a>.</li>
+                <li>Principal's public work: <a href="https://jonesrussell.github.io" target="_blank" rel="noopener">jonesrussell.github.io</a>.</li>
+                <li>Contact: <a href="mailto:contact@northops.ca">contact@northops.ca</a>.</li>
             </ul>
         </div>
     </section>
@@ -109,7 +125,7 @@
     <section class="section section-cta">
         <div class="container">
             <h2>Work with us.</h2>
-            <a href="/contact" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="/contact" class="btn btn-primary btn-lg">Book a discovery call</a>
         </div>
     </section>
 {% endblock %}

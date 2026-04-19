@@ -1,7 +1,7 @@
 {% extends "base.html.twig" %}
 
 {% block title %}Services — NorthOps{% endblock %}
-{% block description %}Four focused service lines: web application engineering, content and data pipelines, DevOps and CI/CD, and AI engineering. Fixed-price MVPs starting at CAD $3,600.{% endblock %}
+{% block description %}AI systems architecture, platform engineering, content and data pipelines, advisory, and Indigenous data sovereignty services for scaleups and public-sector teams.{% endblock %}
 
 {% block content %}
     <!-- Page Intro -->
@@ -9,8 +9,8 @@
         <div class="container">
             <h1>Services</h1>
             <p class="hero-sub">
-                Four focused service lines, each scoped as a fixed-price MVP. We build what we know.
-                Nothing else.
+                Five focused service lines. Each sits behind a clear engagement shape — discovery sprint,
+                fixed-price MVP, implementation contract, or fractional retainer.
             </p>
         </div>
     </section>
@@ -19,26 +19,64 @@
     <section class="section">
         <div class="container">
             <div class="service-grid">
-                <a href="/services/web-application-engineering" class="service-card">
-                    <h3>Web Application Engineering</h3>
-                    <p>Full-stack Laravel and Vue applications scoped, built, and shipped as a working product. Includes auth, admin, deployment, and documentation.</p>
-                    <span class="service-price">Starting at CAD $6,000</span>
+                <a href="/services/ai-systems-architecture" class="service-card">
+                    <h3>AI Systems Architecture</h3>
+                    <p>Architecture, specs, and deterministic patterns for teams adopting LLMs, agentic workflows, or AI-assisted development at scale.</p>
+                </a>
+                <a href="/services/platform-engineering" class="service-card">
+                    <h3>Platform Engineering</h3>
+                    <p>Production systems on Laravel, Symfony, or modern TypeScript stacks. Entity-first architecture, observability, CI/CD, agent-safe repos.</p>
                 </a>
                 <a href="/services/content-data-pipelines" class="service-card">
                     <h3>Content &amp; Data Pipelines</h3>
                     <p>Automated ingestion, transformation, and delivery pipelines that move your data where it needs to go. Reliably and on schedule.</p>
-                    <span class="service-price">Starting at CAD $4,800</span>
                 </a>
-                <a href="/services/devops-cicd" class="service-card">
-                    <h3>DevOps &amp; CI/CD</h3>
-                    <p>Production-ready infrastructure, deployment pipelines, and monitoring configured for your stack and your team's workflow.</p>
-                    <span class="service-price">Starting at CAD $3,600</span>
+                <a href="/services/advisory-fractional-leadership" class="service-card">
+                    <h3>Advisory &amp; Fractional Leadership</h3>
+                    <p>Senior judgment on retainer. Embedded in your architecture decisions, roadmap reviews, and hiring calls.</p>
                 </a>
-                <a href="/services/ai-engineering" class="service-card">
-                    <h3>AI Engineering</h3>
-                    <p>LLM integrations, RAG pipelines, and AI-powered features built into your product, not bolted on as an afterthought.</p>
-                    <span class="service-price">Starting at CAD $7,800</span>
+                <a href="/services/indigenous-data-sovereignty" class="service-card">
+                    <h3>Indigenous Data Sovereignty</h3>
+                    <p>Systems that respect OCAP® principles and community data sovereignty. Led by an Anishinaabe operator from Sagamok First Nation.</p>
                 </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Engagement Shapes -->
+    <section id="engagement-shapes" class="section section-alt">
+        <div class="container">
+            <h2>Engagement shapes</h2>
+            <p class="section-intro">
+                We match the engagement shape to the work. Concrete pricing is confirmed in a statement
+                of work after discovery.
+            </p>
+            <div class="engagement-grid">
+                <div class="engagement-card">
+                    <h3>Discovery Sprint</h3>
+                    <p class="engagement-meta">Starting at CAD $12,000</p>
+                    <p>One-to-two weeks. Architecture map, recommendations, and a concrete plan for the work ahead. Right when you need senior judgment before committing a build budget.</p>
+                </div>
+                <div class="engagement-card">
+                    <h3>Fixed-Price MVP</h3>
+                    <p class="engagement-meta">Starting at CAD $8,000</p>
+                    <p>1–2 week delivery for a scoped build. Clear deliverables, transparent pricing, 50% deposit. Right when the scope is known and you want a working system handed off clean.</p>
+                </div>
+                <div class="engagement-card">
+                    <h3>Implementation Contract</h3>
+                    <p class="engagement-meta">From CAD $1,500/day</p>
+                    <p>Senior hands on a clear scope, for as long as the work requires. Right when your team knows what needs to be built and needs experienced engineers to build it alongside them.</p>
+                </div>
+                <div class="engagement-card">
+                    <h3>Fractional Retainer</h3>
+                    <p class="engagement-meta">From CAD $8,000/month</p>
+                    <p>One day per week, embedded in your architecture decisions, roadmap reviews, and hiring calls. Alternative to a full-time senior hire when scope doesn't justify the headcount.</p>
+                </div>
+                <div class="engagement-card">
+                    <h3>Advisory Hours</h3>
+                    <p class="engagement-meta">From CAD $250/hour</p>
+                    <p>Pre-booked blocks for architecture reviews, PR feedback, and decision consultations. Right when you need a second opinion from a senior engineer, fast.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -47,7 +85,7 @@
     <section class="section section-cta">
         <div class="container">
             <h2>Have a project in mind?</h2>
-            <a href="/contact" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="/contact" class="btn btn-primary btn-lg">Book a discovery call</a>
         </div>
     </section>
 {% endblock %}
