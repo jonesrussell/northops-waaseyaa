@@ -3840,16 +3840,16 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v7.4.7",
+            "version": "v7.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/validator.git",
-                "reference": "3a1a460a9f8c5e5611e15c52c4baa5a62fa3c203"
+                "reference": "8f73cbddae916756f319b3e195088da216f0f12f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/validator/zipball/3a1a460a9f8c5e5611e15c52c4baa5a62fa3c203",
-                "reference": "3a1a460a9f8c5e5611e15c52c4baa5a62fa3c203",
+                "url": "https://api.github.com/repos/symfony/validator/zipball/8f73cbddae916756f319b3e195088da216f0f12f",
+                "reference": "8f73cbddae916756f319b3e195088da216f0f12f",
                 "shasum": ""
             },
             "require": {
@@ -3920,7 +3920,7 @@
             "description": "Provides tools to validate values",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/validator/tree/v7.4.7"
+                "source": "https://github.com/symfony/validator/tree/v7.4.8"
             },
             "funding": [
                 {
@@ -3940,7 +3940,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-06T11:10:17+00:00"
+            "time": "2026-03-30T12:55:43+00:00"
         },
         {
             "name": "symfony/var-exporter",
@@ -6386,21 +6386,21 @@
         },
         {
             "name": "waaseyaa/typed-data",
-            "version": "v0.1.0-alpha.104",
+            "version": "v0.1.0-alpha.110",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/typed-data.git",
-                "reference": "9dd618113666cb4c50ce5f87eeef6ee9c7fe352b"
+                "reference": "66027bb4a37498708dabbcaf0e529fd3c401cabd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waaseyaa/typed-data/zipball/9dd618113666cb4c50ce5f87eeef6ee9c7fe352b",
-                "reference": "9dd618113666cb4c50ce5f87eeef6ee9c7fe352b",
+                "url": "https://api.github.com/repos/waaseyaa/typed-data/zipball/66027bb4a37498708dabbcaf0e529fd3c401cabd",
+                "reference": "66027bb4a37498708dabbcaf0e529fd3c401cabd",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.4",
-                "symfony/validator": "^7.3"
+                "symfony/validator": "^7.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -6424,9 +6424,9 @@
             "description": "Type system with PHP-native facade for Waaseyaa",
             "support": {
                 "issues": "https://github.com/waaseyaa/typed-data/issues",
-                "source": "https://github.com/waaseyaa/typed-data/tree/v0.1.0-alpha.104"
+                "source": "https://github.com/waaseyaa/typed-data/tree/v0.1.0-alpha.110"
             },
-            "time": "2026-03-16T21:50:01+00:00"
+            "time": "2026-04-08T15:54:17+00:00"
         },
         {
             "name": "waaseyaa/user",
@@ -6484,21 +6484,21 @@
         },
         {
             "name": "waaseyaa/validation",
-            "version": "v0.1.0-alpha.104",
+            "version": "v0.1.0-alpha.110",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/validation.git",
-                "reference": "0df42910835b3668fe0a00f72f381f179787c6ef"
+                "reference": "f26a5e026d5f7e1911861de78b6b6c2298f179e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waaseyaa/validation/zipball/0df42910835b3668fe0a00f72f381f179787c6ef",
-                "reference": "0df42910835b3668fe0a00f72f381f179787c6ef",
+                "url": "https://api.github.com/repos/waaseyaa/validation/zipball/f26a5e026d5f7e1911861de78b6b6c2298f179e2",
+                "reference": "f26a5e026d5f7e1911861de78b6b6c2298f179e2",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.4",
-                "symfony/validator": "^7.3",
+                "symfony/validator": "^7.0",
                 "waaseyaa/typed-data": "^0.1"
             },
             "require-dev": {
@@ -6523,9 +6523,9 @@
             "description": "Data validation constraints and validators for Waaseyaa",
             "support": {
                 "issues": "https://github.com/waaseyaa/validation/issues",
-                "source": "https://github.com/waaseyaa/validation/tree/v0.1.0-alpha.104"
+                "source": "https://github.com/waaseyaa/validation/tree/v0.1.0-alpha.110"
             },
-            "time": "2026-03-27T19:12:28+00:00"
+            "time": "2026-04-08T15:54:17+00:00"
         },
         {
             "name": "waaseyaa/workflows",
