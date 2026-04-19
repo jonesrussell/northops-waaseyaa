@@ -4712,16 +4712,16 @@
         },
         {
             "name": "waaseyaa/cache",
-            "version": "v0.1.0-alpha.104",
+            "version": "v0.1.0-alpha.110",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waaseyaa/cache.git",
-                "reference": "3237b4b6460f1b70499c50e788d3995570aa60f8"
+                "reference": "c2517edfb8029f5268508e35cc51f85e643b6b41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waaseyaa/cache/zipball/3237b4b6460f1b70499c50e788d3995570aa60f8",
-                "reference": "3237b4b6460f1b70499c50e788d3995570aa60f8",
+                "url": "https://api.github.com/repos/waaseyaa/cache/zipball/c2517edfb8029f5268508e35cc51f85e643b6b41",
+                "reference": "c2517edfb8029f5268508e35cc51f85e643b6b41",
                 "shasum": ""
             },
             "require": {
@@ -4755,9 +4755,9 @@
             "description": "Cache bins with cache tag invalidation for Waaseyaa",
             "support": {
                 "issues": "https://github.com/waaseyaa/cache/issues",
-                "source": "https://github.com/waaseyaa/cache/tree/v0.1.0-alpha.104"
+                "source": "https://github.com/waaseyaa/cache/tree/v0.1.0-alpha.110"
             },
-            "time": "2026-03-23T00:58:08+00:00"
+            "time": "2026-04-08T15:25:48+00:00"
         },
         {
             "name": "waaseyaa/cli",
