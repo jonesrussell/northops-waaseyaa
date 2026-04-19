@@ -262,10 +262,11 @@ final class AppServiceProvider extends ServiceProvider
         );
 
         $validServices = [
-            'web-application-engineering',
+            'ai-systems-architecture',
+            'platform-engineering',
             'content-data-pipelines',
-            'devops-cicd',
-            'ai-engineering',
+            'advisory-fractional-leadership',
+            'indigenous-data-sovereignty',
         ];
 
         foreach ($validServices as $slug) {

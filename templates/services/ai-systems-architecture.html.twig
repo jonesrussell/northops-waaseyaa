@@ -1,0 +1,84 @@
+{% extends "base.html.twig" %}
+
+{% block title %}AI Systems Architecture — NorthOps{% endblock %}
+{% block description %}Architecture, specs, and deterministic patterns for teams adopting LLMs, agentic workflows, or AI-assisted development at scale.{% endblock %}
+
+{% block content %}
+    <!-- Hero -->
+    <section class="section section-hero">
+        <div class="container">
+            <h1>AI Systems Architecture</h1>
+            <p class="hero-sub">
+                You are adopting LLMs, agentic workflows, or AI-assisted development at scale.
+                We design the architecture, write the specs, and stand up the deterministic
+                patterns that keep it working in production.
+            </p>
+        </div>
+    </section>
+
+    <!-- Deliverables -->
+    <section class="section">
+        <div class="container container-narrow">
+            <h2>Deliverables</h2>
+            <ul class="bullet-list">
+                <li>Architecture documents defining agents, boundaries, data flow, and failure modes</li>
+                <li>SKILL.md libraries and codified context rules for agent-safe codebases</li>
+                <li>Reference implementations demonstrating the patterns end-to-end</li>
+                <li>Human-in-the-loop design review for critical agent decisions</li>
+                <li>Governance recommendations: evaluation frameworks, cost controls, audit trails</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Engagement shapes -->
+    <section class="section section-alt">
+        <div class="container container-narrow">
+            <h2>How we engage</h2>
+            <p class="text-block">
+                Most AI architecture work starts as a <strong>Discovery Sprint</strong> (from
+                CAD $12,000) to map the system, then transitions into an
+                <strong>Implementation Contract</strong> or <strong>Fractional Retainer</strong>
+                once the direction is clear. Concrete pricing is confirmed in a statement of work.
+            </p>
+            <p class="text-block">
+                <a href="/services#engagement-shapes">See engagement shapes →</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Stack -->
+    <section class="section">
+        <div class="container container-narrow">
+            <h2>Working context</h2>
+            <div class="tag-list">
+                <span class="tag">Anthropic Claude</span>
+                <span class="tag">Multi-agent orchestration</span>
+                <span class="tag">Spec-driven development</span>
+                <span class="tag">Codified context</span>
+                <span class="tag">RAG + vector stores</span>
+                <span class="tag">Evaluation frameworks</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ideal Client -->
+    <section class="section section-alt">
+        <div class="container container-narrow">
+            <h2>Ideal client</h2>
+            <p class="text-block">
+                You're a scaleup or public-sector team that has moved past AI prototypes and
+                needs a system that holds up in production. You want architecture from someone
+                who runs agent systems daily, not a consultancy that read the same blog posts
+                you did. You value specs and deterministic patterns over demos.
+            </p>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="section section-cta">
+        <div class="container">
+            <h2>Building AI systems for production?</h2>
+            <a href="/contact" class="btn btn-primary btn-lg">Book a discovery call</a>
+        </div>
+    </section>
+{% endblock %}

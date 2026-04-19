@@ -1065,6 +1065,114 @@ li {
     .grid-4 { grid-template-columns: repeat(4, 1fr); }
 }
 
+/* ------------------------------------------------------------
+   Hero CTAs — primary + secondary stack
+   ------------------------------------------------------------ */
+.hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: center;
+}
+
+/* ------------------------------------------------------------
+   Case studies grid
+   ------------------------------------------------------------ */
+.case-grid {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: 1fr;
+    margin-top: var(--space-4);
+}
+
+.case-card {
+    background-color: var(--color-bg-white);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8) var(--space-6);
+}
+
+.case-card h3 {
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+}
+
+.case-card .case-meta {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+}
+
+.case-card p {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    margin-bottom: var(--space-3);
+}
+
+.case-card a {
+    font-weight: var(--font-medium);
+}
+
+@media (min-width: 768px) {
+    .case-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1280px) {
+    .case-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ------------------------------------------------------------
+   Engagement shapes grid
+   ------------------------------------------------------------ */
+.engagement-grid {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: 1fr;
+    margin-top: var(--space-6);
+}
+
+.engagement-card {
+    background-color: var(--color-bg-white);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8) var(--space-6);
+}
+
+.engagement-card h3 {
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+}
+
+.engagement-card .engagement-meta {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+}
+
+.engagement-card p {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+}
+
+@media (min-width: 768px) {
+    .engagement-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1280px) {
+    .engagement-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.section-intro {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    max-width: 60ch;
+    margin-bottom: var(--space-6);
+}
+
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
